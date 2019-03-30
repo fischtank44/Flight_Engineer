@@ -38,14 +38,28 @@ df3 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/enginedata/t
 df4 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/enginedata/train_04_fd.csv', sep= ' ')
 
 ################   This will add a column for the y value which will be the number of cycles until the engine fails.
-# It will be a countdown of the total cycles 
+# It will be a countdown of the total cycles for training set  ######
 
+##  set dataf to dataframe name  ####
+dataf = df4
 max_cycles = []
-for num in range(1, max(df1['unit']) + 1):
-  print(num)
-  max_cycles.append(max(df1['time_cycles'][df1['unit']==num] ) )
-  max_cycles
-  len(max_cycles)
+for num in range(1, max(dataf['unit']) + 1):
+#   print(num)
+    max_cycles.append(max(dataf['time_cycles'][dataf['unit']==num] ) )
+#   len(max_cycles)
+    cycles_to_fail = []
+    for total in max_cycles:
+        for cycle in range(total, 0, -1):
+            cycles_to_fail.append(cycle)
+
+    # print(cycles_to_fail)
+    # len(cycles_to_fail)
+    # len(df1)
+dataf['cycles_to_fail'] = cycles_to_fail
+# dataf[dataf['unit']==1]
+### add the cycles to fail on to the original data frame. #####
+dataf = df4
+df4.cycles_to_fail
 
 ############################
 
