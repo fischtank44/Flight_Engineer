@@ -63,8 +63,20 @@ df4.cycles_to_fail
 
 ############################
 
+# use column discribe out how remove the columns that do not change #### 
+
+
+col = ['unit', 'time_cycles', 'op_set_1', 'op_set_2', 'op_set_3', 't2_Inlet',
+       't24_lpc', 't30_hpc', 't50_lpt', 'p2_fip', 'p15_pby', 'p30_hpc',
+       'nf_fan_speed', 'nc_core_speed', 'epr_p50_p2', 'ps_30_sta_press',
+       'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat',
+       'far_b_air_rat', 'htbleed_enthalpy', 'nf_dmd_dem_fan_sp', 'pcn_fr_dmd',
+       'w31_hpt_cool_bl', 'w32_lpt_cool_bl', 'cycles_to_fail']
+
+
 #    view the description of each column 
 col = df1.columns
+# col = train_features
 for c in col:
   print (df1[c].describe() ) 
 
@@ -74,23 +86,37 @@ col = df1.columns
 for c in col:
   print (df1[c].describe()[2] ) 
 
+
+### This will remove features based the standard deviation for each column
+train_features = []
+limit = .01
+col = df1.columns
+for c in col:
+  if (df1[c].describe()[2] ) >= .01:
+      train_features.append(c)
+train_features
+
+#### List of features to train the model to  #######
+train_features = ['unit', 't24_lpc', 't30_hpc', 't50_lpt', 
+    'p30_hpc', 'nf_fan_speed', 'nc_core_speed', 'ps_30_sta_press', 
+    'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
+    'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl']
+
+
+
+
+####  The time cycles column may be used as an alternate y value to train to
+y_cycles_to_fail = df1.cycles_to_fail
+y_time_cycles = df1.time_cycles
+
+
+
 ## this will plot all columns to check for any variation in the data
 for name in col:
     df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
     plt.show()
 
 
-# use column discribe out how remove the columns that do not change #### 
-
-
-
-
-col = ['unit', 'time_cycles', 'op_set_1', 'op_set_2', 'op_set_3', 't2_Inlet',
-       't24_lpc', 't30_hpc', 't50_lpt', 'p2_fip', 'p15_pby', 'p30_hpc',
-       'nf_fan_speed', 'nc_core_speed', 'epr_p50_p2', 'ps_30_sta_press',
-       'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat',
-       'far_b_air_rat', 'htbleed_enthalpy', 'nf_dmd_dem_fan_sp', 'pcn_fr_dmd',
-       'w31_hpt_cool_bl', 'w32_lpt_cool_bl']
 
 #### remove features that do not change at all for this dataset
 for c in col:
