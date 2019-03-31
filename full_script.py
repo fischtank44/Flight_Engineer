@@ -98,9 +98,16 @@ col = ['unit', 'time_cycles', 'op_set_1', 'op_set_2', 'op_set_3', 't2_Inlet',
 pd.tools.plotting.scatter_matrix(df1[col], figsize=(10, 10), s=100)
 plt.show()
 
-######     Several features are not predictive  ######
 
-#   limit the features that are in the model #####
+## this will plot all columns to check for variation within the feature data
+for name in col:
+    df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
+    plt.show()
+
+
+######     Several features appear to not be predictive  ######
+
+#   limit the features that are in the model scatter plot #####
 small_features_list = ['time_cycles', 't24_lpc', 't30_hpc', 't50_lpt', 
     'p30_hpc', 'nf_fan_speed', 'nc_core_speed', 'ps_30_sta_press', 
     'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
@@ -111,10 +118,6 @@ plt.show()
 
 #####                                                       ##### 
 
-## this will plot all columns to check for any variation in the data
-for name in col:
-    df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
-    plt.show()
 
 
 #    view the description of each column 
