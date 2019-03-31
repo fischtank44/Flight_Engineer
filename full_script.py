@@ -46,10 +46,10 @@ np.random.seed(137)
 
 ##### training #############
 
-df1 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/enginedata/train_01_fd.csv', sep= " " )
-df2 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/enginedata/train_02_fd.csv', sep= ' ')
-df3 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/enginedata/train_03_fd.csv', sep= ' ')
-df4 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/enginedata/train_04_fd.csv', sep= ' ')
+df1 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/flight_engineer/enginedata/train_01_fd.csv', sep= " " )
+df2 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/flight_engineer/enginedata/train_02_fd.csv', sep= ' ')
+df3 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/flight_engineer/enginedata/train_03_fd.csv', sep= ' ')
+df4 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/flight_engineer/enginedata/train_04_fd.csv', sep= ' ')
 
 ################   This will add a column for the y value which will be the number of cycles until the engine fails.
 # It will be a countdown of the total cycles for training set  ######
@@ -72,14 +72,14 @@ for num in range(1, max(dataf['unit']) + 1):
 dataf['cycles_to_fail'] = cycles_to_fail
 # dataf[dataf['unit']==1]
 ### add the cycles to fail on to the original data frame. #####
-dataf = df4
+df4 = dataf
 df4.cycles_to_fail
 
 ############################
 
 # use column discribe out how remove the columns that do not change #### 
 
-
+col = df1.columns
 col = ['unit', 'time_cycles', 'op_set_1', 'op_set_2', 'op_set_3', 't2_Inlet',
        't24_lpc', 't30_hpc', 't50_lpt', 'p2_fip', 'p15_pby', 'p30_hpc',
        'nf_fan_speed', 'nc_core_speed', 'epr_p50_p2', 'ps_30_sta_press',
@@ -95,7 +95,7 @@ col = ['unit', 'time_cycles', 'op_set_1', 'op_set_2', 'op_set_3', 't2_Inlet',
 
 
 ##### plot scatter plot for all features    #####
-pd.tools.plotting.scatter_matrix(df1[col], figsize=(10, 10), s=100)
+pd.tools.plotting.scatter_matrix(df1[col], figsize=(10, 10), s=100, alpha=.3)
 plt.show()
 
 
@@ -113,7 +113,7 @@ small_features_list = ['time_cycles', 't24_lpc', 't30_hpc', 't50_lpt',
     'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
     'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl' ]
 
-pd.tools.plotting.scatter_matrix(df1[small_features_list], figsize=(10, 10), s=100)
+pd.tools.plotting.scatter_matrix(df1[small_features_list], figsize=(10, 10), alpha=.3 , s=100)
 plt.show()
 
 #####                                                       ##### 
@@ -171,9 +171,9 @@ for c in col:
 
 
 ## This will make the train test split for the model ####
-y = y_time_cycles
+y = cycles_to_fail
 X_features = df1[train_features]
-Xtrain, Xtest, ytrain, ytest = train_test_split(X_features, y)
+Xtrain, Xtest, ytrain, ytest = train_test_split(X_features, y, test_size = .2, random_state=137)
 Xtrain.shape
 Xtest.shape
 ytrain.shape
@@ -212,5 +212,17 @@ plt.show()
 
 ### First score from basic linear regression model   ####
 base_score = r2(ytrain, L_y_predicted)
+base_score
+linear_model_no_tuning = base_score
+
+#####  score of model no tuning trained to time cycles to go
+##  0.5302416225409862
+
+#### score of model with no tuning trained to cycles remaining 
+##  0.5302416225409862
+##
+### There is no difference between the two which makes sense.
+
+
 
 
