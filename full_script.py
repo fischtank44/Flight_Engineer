@@ -4,8 +4,11 @@ import pandas as pd
 # from pandas.plotting import scatter_matrix
 
 from regression_tools.dftransformers import (
-    ColumnSelector, Identity,
-    FeatureUnion, MapFeature,
+    ColumnSelector, 
+    Identity,
+    Intercept,
+    FeatureUnion, 
+    MapFeature,
     StandardScaler)
 from plot_univariate import plot_one_univariate
 from pandas.tools.plotting import scatter_matrix
@@ -356,12 +359,121 @@ linear_spline_transformer = LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 2
 # cement_column = cement_selector.transform('cycles_to_fail')
 # linear_spline_transformer.transform(cement_column).head()
 
-engines_fit = Pipeline([
-    ('cycles_to_fail', ColumnSelector(name='cycles_to_fail')),
-    ('cycles_to_fail_spline', LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300]))
+train_features
+
+train_features = ['t24_lpc', 
+'t30_hpc', 
+'t50_lpt', 
+'p30_hpc', 
+'nf_fan_speed', 
+'nc_core_speed', 
+'ps_30_sta_press', 
+'phi_fp_ps30', 
+'nrf_cor_fan_sp', 
+'nrc_core_sp', 
+'bpr_bypass_rat', 
+'htbleed_enthalpy', 
+'w31_hpt_cool_bl', 
+'w32_lpt_cool_bl']
+
+
+t24_fit = Pipeline([
+    ('t24_lpc', ColumnSelector(name='t24_lpc')),
+    ('t24_lpc_spline', LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300]))
 ])
 
 df1.head()
 
 
-engines_fit.transform(df1).head()
+t30_fit = Pipeline([
+    ('t30_hpc', ColumnSelector(name='t30_hpc')),
+    ('t30_hpc_spline', LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300]))
+])
+
+
+
+p30_fit = Pipeline([
+    ('p30_hpc', ColumnSelector(name='p30_hpc')),
+    ('p30_hpc_spline', LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300]))
+])
+
+
+nf_fan_fit = Pipeline([
+    ('nf_fan_speed', ColumnSelector(name='nf_fan_speed')),
+    ('nf_fan_speed_spline', LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300]))
+])
+
+
+nc_core_fit = Pipeline([
+    ('nc_core_speed', ColumnSelector(name='nc_core_speed')),
+    ('nc_core_speed_spline', LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300]))
+])
+
+ps_30_fit = Pipeline([
+    ('ps_30_sta_press', ColumnSelector(name='ps_30_sta_press')),
+    ('ps_30_sta_press_spline', LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300]))
+])
+
+
+phi_fp_fit = Pipeline([
+    ('phi_fp_ps30', ColumnSelector(name='phi_fp_ps30')),
+    ('phi_fp_ps30_spline', LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300]))
+])
+
+
+nrf_cor_fit = Pipeline([
+    ('nrf_cor_fan_sp', ColumnSelector(name='nrf_cor_fan_sp')),
+    ('nrf_cor_fan_sp_spline', LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300]))
+])
+
+nrc_core_fit = Pipeline([
+    ('nrc_core_sp', ColumnSelector(name='nrc_core_sp')),
+    ('nrc_core_sp_spline', LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300]))
+])
+
+bpr_bypass_fit = Pipeline([
+    ('bpr_bypass_rat', ColumnSelector(name='bpr_bypass_rat')),
+    ('bpr_bypass_rat_spline', LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300]))
+])
+
+
+htbleed_fit = Pipeline([
+    ('htbleed_enthalpy', ColumnSelector(name='htbleed_enthalpy')),
+    ('htbleed_enthalpy_spline', LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300]))
+])
+
+w31_fit = Pipeline([
+    ('w31_hpt_cool_bl', ColumnSelector(name='w31_hpt_cool_bl')),
+    ('w31_hpt_cool_bl_spline', LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300]))
+])
+
+w32_fit = Pipeline([
+    ('w32_lpt_cool_bl', ColumnSelector(name='w32_lpt_cool_bl')),
+    ('w32_lpt_cool_bl_spline', LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300]))
+])
+
+
+
+feature_pipeline = FeatureUnion([
+    ('intercept', Intercept()),
+    ('t24_lpc', t24_fit),
+    ('t30_hpc', t30_fit),
+    ('p30_hpc', p30_fit),
+    ('nf_fan_speed', nf_fan_fit),
+    ('nc_core_speed', nc_core_fit),
+    ('ps_30_sta_press', ps_30_fit),
+    ('phi_fp_ps30', phi_fp_fit),
+    ('nrf_cor_fan_sp', nrf_core_fit),
+    ('nrc_core_speed', nrc_core_fit),
+    ("ps_30_sta_press", ps_30_fit),
+    ('phi_fp_ps30', phi_fp_fit),
+    ('nrf_cor_fan_sp', nrf_core_fit),
+    ('nrc_core_sp', nrc_core_fit),
+    ("bpr_bypass_rat", bpr_bypass_fit),
+    ("htbleed_enthalpy", htbleed_fit),
+    ("w31_hpt_cool_bl", w31_fit),
+    ("w32_lpt_cool_bl", w32_fit)
+])
+
+
+
