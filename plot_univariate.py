@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
 
 #from basis_expansions.basis_expansions import (
-    Polynomial, LinearSpline)
+    # Polynomial, LinearSpline)
 
 from regression_tools.dftransformers import (
     ColumnSelector, Identity, FeatureUnion, MapFeature, Intercept)
