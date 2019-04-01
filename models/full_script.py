@@ -562,3 +562,12 @@ for idx, e in enumerate(train_engines):
 
 len(y_hat)
 len(ytrain)
+
+#### Score of the first model against the training set.  
+## First score from basic linear regression model   ####
+first_knot_model = r2(ytrain, y_hat)
+first_knot_model
+
+# first_knot_model
+# 0.64194677350961
+
