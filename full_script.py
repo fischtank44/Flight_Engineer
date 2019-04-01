@@ -321,3 +321,18 @@ plt.show()
 
 
 #### Plot each feature individually. 
+###    (ax, df, y, var_name,
+for col in train_features:
+    fig, ax = plt.subplots(figsize=(12, 3))
+    plot_one_univariate(ax, df1, col, 'cycles_to_fail')
+    ax.set_title("Cycles to Fail")
+    plt.xlabel('Cycles to Fail')
+    plt.ylabel( col)
+    plt.show()
+
+#### Begining of the linear spline transformation parameters    #######
+linear_spline_transformer = LinearSpline(knots=[200, 300, 400])
+
+
+
+
