@@ -26,13 +26,13 @@ def plot_one_univariate(ax, df, y, var_name, mask=None, bootstrap=100):
     if mask is None:
         plot_univariate_smooth(
             ax,
-            df[var_name].values.reshape(-1, 1), 
-            df[y],
+            df[y].values.reshape(-1, 1), 
+            df[var_name],
             bootstrap=bootstrap)
     else:
         plot_univariate_smooth(
             ax,
-            df[var_name].values.reshape(-1, 1), 
-            df[y],
+            df[y].values.reshape(-1, 1), 
+            df[var_name],
             mask=mask,
             bootstrap=bootstrap)
