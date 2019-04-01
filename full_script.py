@@ -32,7 +32,7 @@ from sklearn.metrics import r2_score as r2
 from sklearn.pipeline import Pipeline
 from sklearn.utils import resample
 from basis_expansions.basis_expansions import NaturalCubicSpline
-
+import random
 
 import os
 os.getcwd()
@@ -156,7 +156,7 @@ for c in col:
 train_features
 
 #### List of features to train the model to  #######    ### remove 'unit'
-train_features = ['unit' , 't24_lpc', 't30_hpc', 't50_lpt', 
+train_features = [ 't24_lpc', 't30_hpc', 't50_lpt', 
     'p30_hpc', 'nf_fan_speed', 'nc_core_speed', 'ps_30_sta_press', 
     'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
     'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl']
@@ -181,11 +181,42 @@ for name in train_features:
 for c in col:
     df1[c].describe()
 
+#####   adjust the data frame to choose 20 % of the engines by unmber and 
+#####   train to a sample of 80% by number and 20% saved for test data.
+# engines = list(np.random.choice(range(1,101), 20, replace= False))
+engines = [4, 18, 19, 21, 28, 33, 42, 45, 46, 50, 61, 73, 74, 78, 82, 83, 84, 86, 92, 94]
+
+train_engines = []
+for num in range(1,101):
+    if num not in engines:
+        train_engines.append(num)
+train_engines
+
+
+test_idx = df1['unit'].apply(lambda x: x in engines)
+train_idx = df1['unit'].apply(lambda x: x in train_engines)
+test_idx
+train_idx
+
+
+type(test_idx)
+type(train_idx)
+test_list = list(test_idx)
+train_list = list(train_idx)
+
+
+
+df_new_test = df1.iloc[test_list].copy()
+df_new_train = df1.iloc[train_list].copy()
+df_new_test.shape
+df_new_train.shape
 
 
 ## This will make the train test split for the model ####
-y = df1.cycles_to_fail
-X_features = df1[train_features]
+ytrain = df_new_train['cycles_to_fail']
+X_features = df_new_train[train_features]
+
+
 Xtrain, Xtest, ytrain, ytest = train_test_split(X_features, y, test_size = .2, random_state=137)
 Xtrain.shape
 Xtest.shape
@@ -197,8 +228,8 @@ ytest.shape
 
 #LINEAR: 
 L_model = LinearRegression(fit_intercept=True)
-L_model.fit(Xtrain.values, ytrain)
-L_y_predicted = L_model.predict(Xtrain)
+L_model.fit(X_features, ytrain)
+L_y_predicted = L_model.predict(X_features)
 
 
 L_y_predicted
@@ -207,6 +238,8 @@ L_y_predicted
 L_model.coef_
 print(list(zip(L_model.coef_, X_features)))
 
+
+##### Model from old train/test split
 # [(0.2098130774662108, 'unit'), (-7.173759447981604, 't24_lpc'), 
 # (-0.42305195925658207, 't30_hpc'), (-0.7441639445488603, 't50_lpt'), 
 # (7.61219378587503, 'p30_hpc'), (-12.147203483784747, 'nf_fan_speed'), 
@@ -216,8 +249,15 @@ print(list(zip(L_model.coef_, X_features)))
 #  (-1.9171623154921535, 'htbleed_enthalpy'), (22.12461560626438, 'w31_hpt_cool_bl'),
 #  (42.47336192785645, 'w32_lpt_cool_bl')]
 #
-#
-#
+#  Model from new 80 engine 20 test train/test split
+# #print(list(zip(L_model.coef_, X_features)))
+# [(-7.9993983227825884, 't24_lpc'), (-0.40343998913641343, 't30_hpc'), 
+# (-0.858069141166363, 't50_lpt'), (7.118138412200282, 'p30_hpc'), 
+# (-26.53526438485433, 'nf_fan_speed'), (-0.28820253265246504, 'nc_core_speed'), 
+# (-38.13957596837547, 'ps_30_sta_press'), (9.984072018801038, 'phi_fp_ps30'), 
+# (-21.747334830714323, 'nrf_cor_fan_sp'), (-0.28742611769798204, 'nrc_core_sp'), 
+# (-101.5927346354093, 'bpr_bypass_rat'), (-1.6264557877934611, 'htbleed_enthalpy'),
+#  (19.17595070701376, 'w31_hpt_cool_bl'), (42.100133123738566, 'w32_lpt_cool_bl')]
 #
 #
 #
@@ -248,7 +288,8 @@ plt.show()
 ### First score from basic linear regression model   ####
 base_score = r2(ytrain, L_y_predicted)
 base_score
-linear_model_no_tuning = base_score
+linear_model_80_engine = base_score
+linear_model_80_engine
 
 #####  score of model no tuning trained to time cycles to go
 ##  0.5302416225409862
@@ -258,6 +299,8 @@ linear_model_no_tuning = base_score
 ##
 ### There is no difference between the two which makes sense.
 
-
+####  Linear model 80 engine split 
+# linear_model_80_engine
+# 0.6004573742141459
 
 
