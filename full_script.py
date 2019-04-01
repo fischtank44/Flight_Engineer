@@ -52,11 +52,17 @@ df3 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/flight_engin
 df4 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/flight_engineer/enginedata/train_04_fd.csv', sep= ' ')
 
 ################   This will add a column for the y value which will be the number of cycles until the engine fails.
-# It will be a countdown of the total cycles for training set  ######
 
+
+# It will be a countdown of the total cycles for training set  ######
 ##  set dataf to dataframe name  ####
+#### add column to the end for logistic predictive model   ######
+#### 
+
+
 dataf = df1
 max_cycles = []
+y_failure = []
 for num in range(1, max(dataf['unit']) + 1):
 #   print(num)
     max_cycles.append(max(dataf['time_cycles'][dataf['unit']==num] ) )
@@ -64,18 +70,24 @@ for num in range(1, max(dataf['unit']) + 1):
     cycles_to_fail = []
     for total in max_cycles:
         for cycle in range(total, 0, -1):
+            y_failure.append( 1-(cycle/total) )
             cycles_to_fail.append(cycle)
-
     # print(cycles_to_fail)
     # len(cycles_to_fail)
     # len(df1)
+        
 dataf['cycles_to_fail'] = cycles_to_fail
-# dataf[dataf['unit']==1]
-### add the cycles to fail on to the original data frame. #####
+
+
 df1 = dataf
 # df1.cycles_to_fail
 
 ############################
+
+
+
+
+
 
 # use column discribe out how remove the columns that do not change #### 
 
@@ -331,8 +343,20 @@ for col in train_features:
     plt.show()
 
 #### Begining of the linear spline transformation parameters    #######
-linear_spline_transformer = LinearSpline(knots=[200, 300, 400])
+linear_spline_transformer = LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300])
+
+# linear_spline_transformer.transform(df1['cycles_to_fail']).head()
+
+# cement_selector = ColumnSelector(name='cycles_to_fail')
+# cement_column = cement_selector.transform('cycles_to_fail')
+# linear_spline_transformer.transform(cement_column).head()
+
+engines_fit = Pipeline([
+    ('cycles_to_fail', ColumnSelector(name='cycles_to_fail')),
+    ('cycles_to_fail_spline', LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300]))
+])
+
+df1.head()
 
 
-
-
+engines_fit.transform(df1).head()
