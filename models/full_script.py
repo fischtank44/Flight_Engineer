@@ -10,7 +10,7 @@ from regression_tools.dftransformers import (
     FeatureUnion, 
     MapFeature,
     StandardScaler)
-from functions.plot_univariate import plot_one_univariate
+from plot_univariate import plot_one_univariate
 from pandas.tools.plotting import scatter_matrix
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
@@ -204,12 +204,14 @@ for c in col:
 #####   adjust the data frame to choose 20 % of the engines by unmber and 
 #####   train to a sample of 80% by number and 20% saved for test data.
 # engines = list(np.random.choice(range(1,101), 20, replace= False))
-engines = [4, 18, 19, 21, 28, 33, 42, 45, 46, 50, 61, 73, 74, 78, 82, 83, 84, 86, 92, 94]
+test_engines = [4, 18, 19, 21, 28, 33, 42, 45, 46, 50, 61, 73, 74, 78, 82, 83, 84, 86, 92, 94]
 
 train_engines = []
 for num in range(1,101):
-    if num not in engines:
+    if num not in test_engines:
         train_engines.append(num)
+        #
+
 train_engines
 
 
@@ -236,27 +238,27 @@ df_new_train.shape
 ytrain = df_new_train['cycles_to_fail']
 X_features = df_new_train[train_features]
 
-
-Xtrain, Xtest, ytrain, ytest = train_test_split(X_features, y, test_size = .2, random_state=137)
-Xtrain.shape
-Xtest.shape
-ytrain.shape
-ytest.shape
+### Hold for future use  #######
+# Xtrain, Xtest, ytrain, ytest = train_test_split(X_features, y, test_size = .2, random_state=137)
+# Xtrain.shape
+# Xtest.shape
+# ytrain.shape
+# ytest.shape
 
 
 ###   The train test split will include all engines for the start   ####  
 
-#LINEAR: 
-L_model = LinearRegression(fit_intercept=True)
-L_model.fit(X_features, ytrain)
-L_y_predicted = L_model.predict(X_features)
+# #LINEAR: 
+# L_model = LinearRegression(fit_intercept=True)
+# L_model.fit(X_features, ytrain)
+# L_y_predicted = L_model.predict(X_features)
 
 
-L_y_predicted
-############ 
-######   Check the coefficients from the model 
-L_model.coef_
-print(list(zip(L_model.coef_, X_features)))
+# L_y_predicted
+# ############ 
+# ######   Check the coefficients from the model 
+# L_model.coef_
+# print(list(zip(L_model.coef_, X_features)))
 
 
 ##### Model from old train/test split
@@ -282,13 +284,13 @@ print(list(zip(L_model.coef_, X_features)))
 #
 #
 #
-#####   Plot the data from the first model and evaluate the residuals
+# #####   Plot the data from the first model and evaluate the residuals
 
-plt.scatter(L_y_predicted, ytrain, alpha = 0.1)
-plt.xlabel('y hat from training set')
-plt.ylabel( 'y values from training set')
-plt.show()
-###
+# plt.scatter(L_y_predicted, ytrain, alpha = 0.1)
+# plt.xlabel('y hat from training set')
+# plt.ylabel( 'y values from training set')
+# plt.show()
+# ###
 
 
 
@@ -297,19 +299,19 @@ plt.show()
 
 #### Second plot that will show the difference from actuals vs pred
 # fig = plt.figure()
-fig, ax = plt.subplots(figsize=(15,15) )
-ax.plot(list(range(1, len(L_y_predicted) + 1)) , L_y_predicted, '.r', label='predicted')
-ax.plot(list(range(1, len(ytrain) + 1 )) , ytrain, '.b' , label='actual')
-plt.xlabel('Index of Value')
-plt.ylabel( 'Cycles to Fail')
-ax.legend()
-plt.show()
+# fig, ax = plt.subplots(figsize=(15,15) )
+# ax.plot(list(range(1, len(L_y_predicted) + 1)) , L_y_predicted, '.r', label='predicted')
+# ax.plot(list(range(1, len(ytrain) + 1 )) , ytrain, '.b' , label='actual')
+# plt.xlabel('Index of Value')
+# plt.ylabel( 'Cycles to Fail')
+# ax.legend()
+# plt.show()
 
 ### First score from basic linear regression model   ####
-base_score = r2(ytrain, L_y_predicted)
-base_score
-linear_model_80_engine = base_score
-linear_model_80_engine
+# base_score = r2(ytrain, L_y_predicted)
+# base_score
+# linear_model_80_engine = base_score
+# linear_model_80_engine
 
 #####  score of model no tuning trained to time cycles to go
 ##  0.5302416225409862
