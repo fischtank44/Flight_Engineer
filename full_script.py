@@ -55,7 +55,7 @@ df4 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/flight_engin
 # It will be a countdown of the total cycles for training set  ######
 
 ##  set dataf to dataframe name  ####
-dataf = df4
+dataf = df1
 max_cycles = []
 for num in range(1, max(dataf['unit']) + 1):
 #   print(num)
@@ -72,8 +72,8 @@ for num in range(1, max(dataf['unit']) + 1):
 dataf['cycles_to_fail'] = cycles_to_fail
 # dataf[dataf['unit']==1]
 ### add the cycles to fail on to the original data frame. #####
-df4 = dataf
-df4.cycles_to_fail
+df1 = dataf
+# df1.cycles_to_fail
 
 ############################
 
@@ -99,6 +99,8 @@ pd.tools.plotting.scatter_matrix(df1[col], figsize=(10, 10), s=100, alpha=.3)
 plt.show()
 
 
+
+
 ## this will plot all columns to check for variation within the feature data
 for name in col:
     df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
@@ -113,11 +115,22 @@ small_features_list = ['time_cycles', 't24_lpc', 't30_hpc', 't50_lpt',
     'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
     'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl' ]
 
-pd.tools.plotting.scatter_matrix(df1[small_features_list], figsize=(10, 10), alpha=.3 , s=100)
+#####     Below is the cycles to fail columns        ##### 
+
+_ = scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
+plt.show()
+
+
+#   limit the features that are in the model scatter plot #####
+small_features_list = ['cycles_to_fail' , 't24_lpc', 't30_hpc', 't50_lpt', 
+    'p30_hpc', 'nf_fan_speed', 'nc_core_speed', 'ps_30_sta_press', 
+    'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
+    'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl' ]
+
+_ = scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
 plt.show()
 
 #####                                                       ##### 
-
 
 
 #    view the description of each column 
@@ -142,8 +155,8 @@ for c in col:
       train_features.append(c)
 train_features
 
-#### List of features to train the model to  #######
-train_features = ['unit', 't24_lpc', 't30_hpc', 't50_lpt', 
+#### List of features to train the model to  #######    ### remove 'unit'
+train_features = ['unit' , 't24_lpc', 't30_hpc', 't50_lpt', 
     'p30_hpc', 'nf_fan_speed', 'nc_core_speed', 'ps_30_sta_press', 
     'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
     'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl']
@@ -171,7 +184,7 @@ for c in col:
 
 
 ## This will make the train test split for the model ####
-y = cycles_to_fail
+y = df1.cycles_to_fail
 X_features = df1[train_features]
 Xtrain, Xtest, ytrain, ytest = train_test_split(X_features, y, test_size = .2, random_state=137)
 Xtrain.shape
@@ -190,14 +203,36 @@ L_y_predicted = L_model.predict(Xtrain)
 
 L_y_predicted
 ############ 
+######   Check the coefficients from the model 
+L_model.coef_
+print(list(zip(L_model.coef_, X_features)))
 
-
+# [(0.2098130774662108, 'unit'), (-7.173759447981604, 't24_lpc'), 
+# (-0.42305195925658207, 't30_hpc'), (-0.7441639445488603, 't50_lpt'), 
+# (7.61219378587503, 'p30_hpc'), (-12.147203483784747, 'nf_fan_speed'), 
+# (-0.3844533247091928, 'nc_core_speed'), (-34.641657728829905, 'ps_30_sta_press'),
+#  (11.105368284298036, 'phi_fp_ps30'), (-4.474447225499914, 'nrf_cor_fan_sp'), 
+#  (-0.20542361139388693, 'nrc_core_sp'), (-126.19522472669553, 'bpr_bypass_rat'), 
+#  (-1.9171623154921535, 'htbleed_enthalpy'), (22.12461560626438, 'w31_hpt_cool_bl'),
+#  (42.47336192785645, 'w32_lpt_cool_bl')]
+#
+#
+#
+#
+#
+#
+#
 #####   Plot the data from the first model and evaluate the residuals
 
 plt.scatter(L_y_predicted, ytrain, alpha = 0.1)
 plt.xlabel('y hat from training set')
 plt.ylabel( 'y values from training set')
 plt.show()
+###
+
+
+
+
 
 
 #### Second plot that will show the difference from actuals vs pred
