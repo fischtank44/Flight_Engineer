@@ -213,9 +213,11 @@ for num in range(1,101):
         #
 
 train_engines
+test_engines
 
 
-test_idx = df1['unit'].apply(lambda x: x in engines)
+
+test_idx = df1['unit'].apply(lambda x: x in test_engines)
 train_idx = df1['unit'].apply(lambda x: x in train_engines)
 test_idx
 train_idx
@@ -347,9 +349,9 @@ plt.show()
 for col in train_features:
     fig, ax = plt.subplots(figsize=(12, 3))
     plot_one_univariate(ax, df1, 'cycles_to_fail', col )
-    ax.set_title("Cycles to Fail")
-    plt.xlabel('Cycles to Fail')
-    plt.ylabel( col)
+    ax.set_title("Evaluation of: " + str(col))
+    plt.xlabel(col)
+    plt.ylabel( 'Cycles to Fail')
     plt.show()
 
 #### Begining of the linear spline transformation parameters    #######
@@ -489,7 +491,7 @@ features = feature_pipeline.transform(df_new_train)
 #####   
 
 
-
+###    Fit model to the pipeline   #######
 model = LinearRegression(fit_intercept=True)
 model.fit(features.values, ytrain)
 
@@ -498,5 +500,7 @@ model.predict(features.values)
 display_coef(model, features.columns)
 
 model.coef_
+
+
 
 
