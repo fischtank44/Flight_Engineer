@@ -212,6 +212,11 @@ for num in range(1,101):
         train_engines.append(num)
         #
 
+train_engines = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 22, 23, 24, 25, 26, 
+    27, 29, 30, 31, 32, 34, 35, 36, 37, 38, 39, 40, 41, 43, 44, 47, 48, 49, 51, 52, 53, 54, 55, 
+    56, 57, 58, 59, 60, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 75, 76, 77, 79, 80, 81, 85, 
+    87, 88, 89, 90, 91, 93, 95, 96, 97, 98, 99, 100]
+
 train_engines
 test_engines
 
@@ -495,12 +500,65 @@ features = feature_pipeline.transform(df_new_train)
 model = LinearRegression(fit_intercept=True)
 model.fit(features.values, ytrain)
 
-model.predict(features.values)
 
+#### View the coefficients
 display_coef(model, features.columns)
 
-model.coef_
+
+
+####  Make predictions against the training set
+y_hat = model.predict(features.values)
+
+####  Plot predictions from data against the actual values ########
+plt.scatter(y_hat, ytrain, alpha = 0.1)
+plt.xlabel('y hat from training set')
+plt.ylabel( 'y values from training set')
+plt.show()
+###
 
 
 
 
+
+#### Second plot that will show the difference from actuals vs pred for the pipeline model   ###### 
+
+fig, ax = plt.subplots(figsize=(15,15) )
+ax.plot(list(range(1, len(y_hat) + 1)) , y_hat, '.r', label='predicted')
+ax.plot(list(range(1, len(ytrain) + 1 )) , ytrain, '.b' , label='actual')
+plt.xlabel('Index of Value')
+plt.ylabel( 'Cycles to Fail')
+ax.legend()
+plt.show()
+
+##########################################
+
+
+train_eng_max_cycles = []
+for e in train_engines:
+    train_eng_max_cycles.append(max(df1['time_cycles'][df1['unit']==e]))
+
+# run
+
+train_eng_max_cycles
+ 
+ 
+    # #print(num)
+    # max_cycles.append(max(df['time_cycles'][df['unit']==num] ) )
+
+
+
+#### Third plot that will show the difference from actuals vs pred for the pipeline model for each engine  ###### 
+for idx, e in enumerate(train_engines):
+    start_idx = 0
+    end_idx = start_idx + train_eng_max_cycles[idx]
+    fig, ax = plt.subplots(figsize=(15,15) )
+    ax.plot(list(range(start_idx, end_idx)) , y_hat[start_idx:end_idx], '.r', label='predicted')
+    ax.plot(list(range(start_idx, end_idx)) , ytrain[start_idx:end_idx] , '.b' , label='actual')
+    plt.xlabel('Index of Value')
+    plt.ylabel( 'Cycles to Fail')
+    ax.legend()
+    start_idx += end_idx
+    plt.show()
+
+len(y_hat)
+len(ytrain)
