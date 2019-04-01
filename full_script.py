@@ -7,7 +7,7 @@ from regression_tools.dftransformers import (
     ColumnSelector, Identity,
     FeatureUnion, MapFeature,
     StandardScaler)
-
+from plot_univariate import plot_one_univariate
 from pandas.tools.plotting import scatter_matrix
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
@@ -304,3 +304,20 @@ linear_model_80_engine
 # 0.6004573742141459
 
 
+
+# Begin spline analysis of each significant feature
+# plot the full range of each engine against the cycles to fail
+fig, axs = plt.subplots(3, 5, figsize=(14, 8))
+univariate_plot_names = df1[train_features]                                     #columns[:-1]
+
+for name, ax in zip(univariate_plot_names, axs.flatten()):
+    plot_univariate_smooth(ax,
+                           df1['cycles_to_fail'],
+                           df1[name].values.reshape(-1, 1),
+                           bootstrap=100)
+    ax.set_title(name)
+plt.show()
+
+
+
+#### Plot each feature individually. 
