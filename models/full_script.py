@@ -554,12 +554,13 @@ for idx, e in enumerate(train_engines):
     end_idx = start_idx + train_eng_max_cycles[idx]
     print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
     fig, ax = plt.subplots(figsize=(15,15) )
-    ax.plot(list(range(start_idx, end_idx)) , y_hat[start_idx:end_idx], '.r', label='predicted')
-    ax.plot(list(range(start_idx, end_idx)) , ytrain[start_idx:end_idx] , '.b' , label='actual')
-    plt.xlabel('Index of Value')
+    ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
+    ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '.b' , label='actual')
+    plt.title('Engine #: ' + str(e))
+    plt.xlabel('Index')
     plt.ylabel( 'Cycles to Fail')
     ax.legend()
-    start_idx += end_idx
+    start_idx = end_idx 
     plt.show()
 
 len(y_hat)
