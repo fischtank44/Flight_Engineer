@@ -26,4 +26,5 @@ The second variable was optimized for a logistic model. The value for y was deri
 
 
 ## Models:
-	Linear regression with knots and splines. 
+
+Linear regression with knots and splines. 
