@@ -548,7 +548,36 @@ train_eng_max_cycles
 
 
 
+
+    # ax.set_title('Plot number {}'.format(i))
+
+
+##### this is the plot of all 80 engines on a single chart
+
+fig, axs = plt.subplots(8,10, figsize=(10,4))
+start_idx = 0
+for idx, ax in enumerate(axs.flatten()):
+# for idx, e in enumerate(train_engines):
+    end_idx = start_idx + train_eng_max_cycles[idx]
+    print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
+    # fig, ax = plt.subplots(figsize=(15,15) )
+    ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
+    ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '.b' , label='actual')
+    # plt.title('Engine #: ' + str(train_engines[idx]))
+    # plt.xlabel('Index')
+    # plt.ylabel( 'Cycles to Fail')
+    # ax.legend()
+    start_idx = end_idx 
+        # plt.show()
+plt.show()
+
+
+
+
+
 #### Third plot that will show the difference from actuals vs pred for the pipeline model for each engine  ###### 
+
+
 start_idx = 0
 for idx, e in enumerate(train_engines):
     end_idx = start_idx + train_eng_max_cycles[idx]
@@ -562,6 +591,8 @@ for idx, e in enumerate(train_engines):
     ax.legend()
     start_idx = end_idx 
     plt.show()
+
+
 
 len(y_hat)
 len(ytrain)
