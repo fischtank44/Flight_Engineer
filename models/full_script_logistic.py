@@ -186,31 +186,38 @@ train_features = [ 't24_lpc', 't30_hpc', 't50_lpt',
 
 
 ####  The time cycles column may be used as an alternate y value to train to
-y_cycles_to_fail = df1.cycles_to_fail
+# y_cycles_to_fail_mean = np.mean(df1.cycles_to_fail)
+# y_cycles_to_fail_mean
+df1.head()
+y_cycles_to_fail = np.log(df1.cycles_to_fail)
 y_time_cycles = df1.time_cycles
-####                                                                  #### 
+####
+# 
+# Train logistic model to y_failure mean cycles: y_cycles_to_fail_mean
+#  108.80786195530997                                                              #### 
+y_failure 
 
 ##   view plots for the features that are to be used in df1   ######
-for name in train_features:
-    df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
-    plt.show()
+# for name in train_features:
+#     df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
+#     plt.show()
 
 
 
-#### remove features that do not change at all for this dataset
-for c in col:
-    df1[c].describe()
+# #### remove features that do not change at all for this dataset
+# for c in col:
+#     df1[c].describe()
 
 #####   adjust the data frame to choose 20 % of the engines by unmber and 
 #####   train to a sample of 80% by number and 20% saved for test data.
 # engines = list(np.random.choice(range(1,101), 20, replace= False))
 test_engines = [4, 18, 19, 21, 28, 33, 42, 45, 46, 50, 61, 73, 74, 78, 82, 83, 84, 86, 92, 94]
 
-train_engines = []
-for num in range(1,101):
-    if num not in test_engines:
-        train_engines.append(num)
-        #
+# train_engines = []
+# for num in range(1,101):
+#     if num not in test_engines:
+#         train_engines.append(num)
+#         #
 
 
 train_engines = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 22, 23, 24, 25, 26, 
@@ -243,7 +250,7 @@ df_new_train.shape
 
 
 ## This will make the train test split for the model ####
-ytrain = df_new_train['cycles_to_fail']
+ytrain = df_new_train['y_failure']
 X_features = df_new_train[train_features]
 
 ### Hold for future use  #######
@@ -589,7 +596,8 @@ plt.show()
 
 
 
-#### Third plot that will show the difference from actuals vs pred for the pipeline model for each engine one by one  ###### 
+#### Third plot that will show the difference from actuals vs pred for
+# #   the pipeline model for each engine one by one  ###### 
 start_idx = 0
 for idx, e in enumerate(train_engines):
     end_idx = start_idx + train_eng_max_cycles[idx]
@@ -613,4 +621,25 @@ first_knot_model
 
 # first_knot_model
 # 0.64194677350961
+
+
+### This will function will create the actual estimations vs predicted values
+def plot_many_predicteds_vs_actuals(var_names, y_hat, n_bins=50):
+    fig, axs = plt.subplots(len(var_names), figsize=(12, 3*len(var_names)))
+    for ax, name in zip(axs, var_names):
+        x = df_new_train[name]
+        predicteds_vs_actuals(ax, x, df_new_train["cycles_to_fail"], y_hat, n_bins=n_bins)
+        # ax.set_title("{} Predicteds vs. Actuals".format(name))
+    return fig, axs
+
+
+
+### This will plot the final estimations vs the actual data
+train_features
+# y_hat = model.predict(features.values)
+fig, axs = plot_many_predicteds_vs_actuals(train_features, y_hat)
+# fig.tight_layout()df1
+plt.show()
+
+
 

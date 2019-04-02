@@ -589,7 +589,8 @@ plt.show()
 
 
 
-#### Third plot that will show the difference from actuals vs pred for the pipeline model for each engine one by one  ###### 
+#### Third plot that will show the difference from actuals vs pred for
+# #   the pipeline model for each engine one by one  ###### 
 start_idx = 0
 for idx, e in enumerate(train_engines):
     end_idx = start_idx + train_eng_max_cycles[idx]
@@ -632,4 +633,6 @@ train_features
 fig, axs = plot_many_predicteds_vs_actuals(train_features, y_hat)
 # fig.tight_layout()df1
 plt.show()
+
+
 
