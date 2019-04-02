@@ -511,9 +511,13 @@ display_coef(model, features.columns)
 y_hat = model.predict(features.values)
 
 ####  Plot predictions from data against the actual values ########
-plt.scatter(y_hat, ytrain, alpha = 0.1)
+x = list(range(1,320))
+y = x
+plt.scatter(y_hat, ytrain, alpha = 0.1, color='blue')
+plt.plot(x, y, '-r', label='y=2x+1')
+plt.title('First Pipline Predictions')
 plt.xlabel('y hat from training set')
-plt.ylabel( 'y values from training set')
+plt.ylabel( 'y actuals from training set')
 plt.show()
 ###
 
@@ -555,6 +559,7 @@ train_eng_max_cycles
 ##### this is the plot of all 80 engines on a single chart
 
 fig, axs = plt.subplots(8,10, figsize=(10,4))
+ax.set_title("Spline Model of 80 Training Engines")
 start_idx = 0
 for idx, ax in enumerate(axs.flatten()):
 # for idx, e in enumerate(train_engines):
@@ -562,22 +567,29 @@ for idx, ax in enumerate(axs.flatten()):
     print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
     # fig, ax = plt.subplots(figsize=(15,15) )
     ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
-    ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '.b' , label='actual')
+    ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '-b' , label='actual')
+    ax.set_title("Engine # " + str(train_engines[idx]), size=6)
+    # plt.tick_params(axis='both', which='major', labelsize=8)
+    # plt.tick_params(axis='both', which='minor', labelsize=6)
+    # plt.xticks(fontsize=8)      #, rotation=90)
     # plt.title('Engine #: ' + str(train_engines[idx]))
     # plt.xlabel('Index')
     # plt.ylabel( 'Cycles to Fail')
     # ax.legend()
+    ax.xaxis.set_tick_params(labelsize=5)
+    ax.yaxis.set_tick_params(labelsize=5)
     start_idx = end_idx 
         # plt.show()
+
+
+plt.tight_layout()
 plt.show()
 
 
 
 
 
-#### Third plot that will show the difference from actuals vs pred for the pipeline model for each engine  ###### 
-
-
+#### Third plot that will show the difference from actuals vs pred for the pipeline model for each engine one by one  ###### 
 start_idx = 0
 for idx, e in enumerate(train_engines):
     end_idx = start_idx + train_eng_max_cycles[idx]
@@ -593,9 +605,6 @@ for idx, e in enumerate(train_engines):
     plt.show()
 
 
-
-len(y_hat)
-len(ytrain)
 
 #### Score of the first model against the training set.  
 ## First score from basic linear regression model   ####
