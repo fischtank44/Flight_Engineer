@@ -114,10 +114,6 @@ col = ['unit', 'time_cycles', 'op_set_1', 'op_set_2', 'op_set_3', 't2_Inlet',
 
 
 
-##### plot scatter plot for all features    #####
-pd.tools.plotting.scatter_matrix(df1[col], figsize=(10, 10), s=100, alpha=.3)
-plt.show()
-
 
 
 
@@ -176,7 +172,7 @@ for c in col:
 train_features
 
 #### List of features to train the model to  #######    ### remove 'unit'
-train_features = [ 't24_lpc', 't30_hpc', 't50_lpt', 
+train_features = ['time_cycles', 't24_lpc', 't30_hpc', 't50_lpt', 
     'p30_hpc', 'nf_fan_speed', 'nc_core_speed', 'ps_30_sta_press', 
     'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
     'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl']
@@ -186,8 +182,8 @@ train_features = [ 't24_lpc', 't30_hpc', 't50_lpt',
 
 
 ####  The time cycles column may be used as an alternate y value to train to
-y_cycles_to_fail = df1.cycles_to_fail
-y_time_cycles = df1.time_cycles
+y_cycles_to_fail =  df1.cycles_to_fail
+# y_time_cycles = df1.time_cycles
 ####                                                                  #### 
 
 ##   view plots for the features that are to be used in df1   ######
@@ -240,6 +236,29 @@ df_new_test = df1.iloc[test_list].copy()
 df_new_train = df1.iloc[train_list].copy()
 df_new_test.shape
 df_new_train.shape
+
+
+
+###### this will make a list of the max number of cycles for the training
+##     engines 
+
+train_eng_max_cycles = []
+for e in train_engines:
+    train_eng_max_cycles.append(max(df1['time_cycles'][df1['unit']==e]))
+
+train_eng_max_cycles
+
+
+#######  the max number of cycles for the test set  ########
+test_eng_max_cycles = []
+for e in test_engines:
+    test_eng_max_cycles.append(max(df1['time_cycles'][df1['unit']==e]))
+
+test_eng_max_cycles
+    
+
+
+
 
 
 ## This will make the train test split for the model ####
@@ -371,7 +390,9 @@ for col in train_features:
 
 train_features
 
-train_features = ['t24_lpc', 
+train_features = 
+['time_cycles', 
+'t24_lpc', 
 't30_hpc', 
 't50_lpt', 
 'p30_hpc', 
@@ -385,6 +406,12 @@ train_features = ['t24_lpc',
 'htbleed_enthalpy', 
 'w31_hpt_cool_bl', 
 'w32_lpt_cool_bl']
+
+
+cycle_fit = Pipeline([
+    ('time_cycles', ColumnSelector(name='time_cycles')),
+    ('time_cycles_spline', LinearSpline(knots=[50, 75, 120, 175 , 220, 244, 258, 280, 235]))
+])
 
 
 t24_fit = Pipeline([
@@ -468,6 +495,7 @@ w32_fit = Pipeline([
 
 
 feature_pipeline = FeatureUnion([
+    ('time_cycles', cycle_fit),
     ('t24_lpc', t24_fit),
     ('t30_hpc', t30_fit),
     ('p30_hpc', p30_fit),
@@ -499,8 +527,10 @@ features = feature_pipeline.transform(df_new_train)
 
 ###    Fit model to the pipeline   #######
 model = LinearRegression(fit_intercept=True)
-model.fit(features.values, ytrain)
+model.fit(features.values, np.log(ytrain))
 
+len(ytrain)
+len(X_features)
 
 #### View the coefficients
 display_coef(model, features.columns)
@@ -509,7 +539,7 @@ display_coef(model, features.columns)
 
 ####  Make predictions against the training set
 y_hat = model.predict(features.values)
-
+y_hat = np.exp(y_hat)
 ####  Plot predictions from data against the actual values ########
 x = list(range(1,320))
 y = x
@@ -538,15 +568,6 @@ plt.show()
 ##########################################
 
 
-train_eng_max_cycles = []
-for e in train_engines:
-    train_eng_max_cycles.append(max(df1['time_cycles'][df1['unit']==e]))
-
-# run
-
-train_eng_max_cycles
- 
- 
     # #print(num)
     # max_cycles.append(max(df['time_cycles'][df['unit']==num] ) )
 
@@ -609,11 +630,16 @@ for idx, e in enumerate(train_engines):
 
 #### Score of the first model against the training set.  
 ## First score from basic linear regression model   ####
-first_knot_model = r2(ytrain, y_hat)
-first_knot_model
-
+log_knot_model = r2(ytrain, y_hat)
+log_knot_model
+time_knot_model
 # first_knot_model
 # 0.64194677350961
+# 0.7396060171044228
+# log_knot_model
+# 0.7272227017732488
+#log_knot_model
+# 0.7273228097635444
 
 
 ### This will function will create the actual estimations vs predicted values
