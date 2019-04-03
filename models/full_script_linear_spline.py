@@ -132,7 +132,8 @@ small_features_list = ['time_cycles', 't24_lpc', 't30_hpc', 't50_lpt',
     'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
     'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl' ]
 
-#####     Below is the cycles to fail columns        ##### 
+
+#####     Scatter matrix using time cycles            ##### 
 
 scatter_matrix = pd.scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
 
@@ -142,7 +143,8 @@ for ax in scatter_matrix.ravel():
 plt.show()
 
 
-#   limit the features that are in the model scatter plot #####
+
+#####         Scatter matrix using cycles to fail        #####
 small_features_list = ['cycles_to_fail' , 't24_lpc', 't30_hpc', 't50_lpt', 
     'p30_hpc', 'nf_fan_speed', 'nc_core_speed', 'ps_30_sta_press', 
     'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
@@ -182,6 +184,11 @@ for c in col:
       train_features.append(c)
 train_features
 
+####   Created the short list of features to train to ######
+
+
+
+
 #### List of features to train the model to  #######    ### remove 'unit'
 train_features = ['time_cycles', 't24_lpc', 't30_hpc', 't50_lpt', 
     'p30_hpc', 'nf_fan_speed', 'nc_core_speed', 'ps_30_sta_press', 
@@ -217,7 +224,7 @@ train_engines = []
 for num in range(1,101):
     if num not in test_engines:
         train_engines.append(num)
-        #
+#        #
 
 
 train_engines = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 22, 23, 24, 25, 26, 
@@ -254,8 +261,8 @@ df_new_train.shape
 
 
 
-###### this will make a list of the max number of cycles for the training
-##     engines 
+###### this will make a list of the max number of cycles for the training set of engines
+##     
 
 train_eng_max_cycles = []
 for e in train_engines:
@@ -268,7 +275,7 @@ stats.describe(train_eng_max_cycles)
 #  skewness=1.063155863408599, kurtosis=1.5047506637832253)
 
 
-#######  the max number of cycles for the test set  ########
+#######  the max number of cycles for the test set of engines  ########
 test_eng_max_cycles = []
 for e in test_engines:
     test_eng_max_cycles.append(max(df1['time_cycles'][df1['unit']==e]))
@@ -376,7 +383,9 @@ X_test_feaures = df_new_test[train_features]
 
 
 # Begin spline analysis of each significant feature
-# plot the full range of each engine against the cycles to fail
+
+
+###### plot the full range of each engine against the cycles to fail
 fig, axs = plt.subplots(3, 5, figsize=(14, 8))
 univariate_plot_names = df1[train_features]                                     #columns[:-1]
 
@@ -564,6 +573,8 @@ plt.show()
 ####  Make predictions against the training set
 y_hat = model.predict(features.values)
 y_hat = np.exp(y_hat)                       ## <----- note: the exp to transform back
+
+
 ####  Plot predictions from data against the actual values ########
 x = list(range(1,320))
 y = x
@@ -652,18 +663,7 @@ for idx, e in enumerate(train_engines):
 
 
 
-#### Score of the first model against the training set.  
-## First score from basic linear regression model   ####
-log_knot_model = r2(ytrain, y_hat)
-log_knot_model
-time_knot_model
-# first_knot_model
-# 0.64194677350961
-# 0.7396060171044228
-# log_knot_model
-# 0.7272227017732488
-#log_knot_model
-# 0.7273228097635444
+
 
 
 ### This will function will create the actual estimations vs predicted values
@@ -683,6 +683,80 @@ train_features
 fig, axs = plot_many_predicteds_vs_actuals(train_features, y_hat)
 # fig.tight_layout()df1
 plt.show()
+
+
+
+
+
+##########################    Scoreing Section   ###############
+
+
+
+#### Score of the first model against the training set.  
+## First score from basic linear regression model   ####
+log_knot_model = r2(ytrain, y_hat)
+log_knot_model
+# time_knot_model
+# first_knot_model
+# 0.64194677350961
+# 0.7396060171044228
+# log_knot_model
+# 0.7272227017732488
+#log_knot_model
+# 0.7273228097635444
+
+
+
+
+##### R-squared for the last 100 observations  #####
+#
+ytrain
+y_hat
+def r2_for_last_n_cycles(y_hat , y_act, last_n=50):
+    ytrain_n = []
+    y_act_n = []
+    for idx, cycle in enumerate(y_act):
+        # print(cycle)
+        if cycle <= last_n:
+            ytrain_n.append(cycle)
+            y_act_n.append(y_hat[idx])
+    # print(len(ytrain_n))
+    # print(len(y_act_n))
+    return ("The r-squared for the last %s cycles is: " + str(r2(ytrain_n, y_act_n) )) % last_n
+
+r2_for_last_n_cycles(y_hat , ytrain, last_n=150)
+r2_for_last_n_cycles(y_hat , ytrain, last_n=100)
+r2_for_last_n_cycles(y_hat , ytrain, last_n=75)
+r2_for_last_n_cycles(y_hat , ytrain, last_n=50)
+r2_for_last_n_cycles(y_hat , ytrain, last_n=25)
+r2_for_last_n_cycles(y_hat , ytrain, last_n=15)
+
+
+###################   Make a list of r squared values for plotting   ##########
+
+def r2_generator_last_n_cycles(y_hat , y_act, last_n=50):
+    r_squared_vals = []
+    for num in range(last_n, 0, -1):
+        # print(num)
+        ytrain_n = []
+        y_act_n = []
+        for idx, cycle in enumerate(y_act):
+            # print(num)
+            if cycle <= num:
+                ytrain_n.append(cycle +.0000000000001)
+                y_act_n.append(y_hat[idx])
+        # print(ytrain_n, y_act_n)
+        r_squared_vals.append(r2(ytrain_n, y_act_n) )
+        # print(len(ytrain_n), len(y_act_n), len(r_squared_vals))
+    return r_squared_vals
+
+r2_values = r2_generator_last_n_cycles(y_hat , ytrain, 150)
+
+plt.scatter(range(len(r2_values)+1, 1, -1) , r2_values)
+plt.ylim(.7, 0)
+plt.show()
+
+### Plot of r-squared as the number of observations approaches 1  #########
 
 
 
