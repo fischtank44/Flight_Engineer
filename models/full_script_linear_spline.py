@@ -10,6 +10,7 @@ from regression_tools.dftransformers import (
     FeatureUnion, 
     MapFeature,
     StandardScaler)
+from scipy import stats
 from plot_univariate import plot_one_univariate
 from pandas.tools.plotting import scatter_matrix
 from sklearn.linear_model import LinearRegression
@@ -121,7 +122,7 @@ col = ['unit', 'time_cycles', 'op_set_1', 'op_set_2', 'op_set_3', 't2_Inlet',
 for name in col:
     df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
     plt.show()
-
+#
 
 ######     Several features appear to not be predictive  ######
 
@@ -133,7 +134,11 @@ small_features_list = ['time_cycles', 't24_lpc', 't30_hpc', 't50_lpt',
 
 #####     Below is the cycles to fail columns        ##### 
 
-_ = scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
+scatter_matrix = pd.scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
+
+for ax in scatter_matrix.ravel():
+    ax.set_xlabel(ax.get_xlabel(), fontsize = 6, rotation = 90)
+    ax.set_ylabel(ax.get_ylabel(), fontsize = 6, rotation = 0)
 plt.show()
 
 
@@ -143,8 +148,14 @@ small_features_list = ['cycles_to_fail' , 't24_lpc', 't30_hpc', 't50_lpt',
     'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
     'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl' ]
 
-_ = scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
+
+scatter_matrix = pd.scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
+
+for ax in scatter_matrix.ravel():
+    ax.set_xlabel(ax.get_xlabel(), fontsize = 6, rotation = 90)
+    ax.set_ylabel(ax.get_ylabel(), fontsize = 6, rotation = 0)
 plt.show()
+
 
 #####                                                       ##### 
 
@@ -216,7 +227,11 @@ train_engines = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 22,
 
 train_engines
 test_engines
-
+# for eng in train_engines:
+#     if eng in test_engines:
+#         print(True)
+#     else:
+#         print(False)
 
 
 test_idx = df1['unit'].apply(lambda x: x in test_engines)
@@ -247,6 +262,10 @@ for e in train_engines:
     train_eng_max_cycles.append(max(df1['time_cycles'][df1['unit']==e]))
 
 train_eng_max_cycles
+stats.describe(train_eng_max_cycles)
+#  DescribeResult(nobs=80, minmax=(128, 362), 
+#  mean=203.4375, variance=2055.6922468354433, 
+#  skewness=1.063155863408599, kurtosis=1.5047506637832253)
 
 
 #######  the max number of cycles for the test set  ########
@@ -264,6 +283,8 @@ test_eng_max_cycles
 ## This will make the train test split for the model ####
 ytrain = df_new_train['cycles_to_fail']
 X_features = df_new_train[train_features]
+ytest = df_new_test['cycles_to_fail']
+X_test_feaures = df_new_test[train_features]
 
 ### Hold for future use  #######
 # Xtrain, Xtest, ytrain, ytest = train_test_split(X_features, y, test_size = .2, random_state=137)
@@ -364,7 +385,7 @@ for name, ax in zip(univariate_plot_names, axs.flatten()):
                            df1['cycles_to_fail'],
                            df1[name].values.reshape(-1, 1),
                            bootstrap=100)
-    ax.set_title(name)
+    ax.set_title(name, fontsize=7)
 plt.show()
 
 
@@ -410,7 +431,7 @@ train_features =
 
 cycle_fit = Pipeline([
     ('time_cycles', ColumnSelector(name='time_cycles')),
-    ('time_cycles_spline', LinearSpline(knots=[50, 75, 120, 175 , 220, 244, 258, 280, 235]))
+    ('time_cycles_spline', LinearSpline(knots=[25, 50, 75, 120, 175 , 220, 240, 260, 280, 300, 320]))
 ])
 
 
@@ -527,7 +548,7 @@ features = feature_pipeline.transform(df_new_train)
 
 ###    Fit model to the pipeline   #######
 model = LinearRegression(fit_intercept=True)
-model.fit(features.values, np.log(ytrain))
+model.fit(features.values, np.log(ytrain))   ## <---- note: the np.log transformation
 
 len(ytrain)
 len(X_features)
@@ -535,11 +556,14 @@ len(X_features)
 #### View the coefficients
 display_coef(model, features.columns)
 
+plt.plot(range(0,len(model.coef_)), model.coef_)
+plt.show()
+
 
 
 ####  Make predictions against the training set
 y_hat = model.predict(features.values)
-y_hat = np.exp(y_hat)
+y_hat = np.exp(y_hat)                       ## <----- note: the exp to transform back
 ####  Plot predictions from data against the actual values ########
 x = list(range(1,320))
 y = x
