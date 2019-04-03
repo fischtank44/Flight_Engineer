@@ -737,12 +737,13 @@ r2_for_last_n_cycles(y_hat , ytrain, last_n=15)
 def r2_generator_last_n_cycles(y_hat , y_act, last_n=50):
     r_squared_vals = []
     for num in range(last_n, 0, -1):
-        # print(num)
+        print(num)
         ytrain_n = []
         y_act_n = []
         for idx, cycle in enumerate(y_act):
             # print(num)
             if cycle <= num:
+                # print(cycle, num)
                 ytrain_n.append(cycle +.0000000000001)
                 y_act_n.append(y_hat[idx])
         # print(ytrain_n, y_act_n)
@@ -750,9 +751,16 @@ def r2_generator_last_n_cycles(y_hat , y_act, last_n=50):
         # print(len(ytrain_n), len(y_act_n), len(r_squared_vals))
     return r_squared_vals
 
-r2_values = r2_generator_last_n_cycles(y_hat , ytrain, 150)
+r2_values = r2_generator_last_n_cycles(y_hat , ytrain, 5)
 
-plt.scatter(range(len(r2_values)+1, 1, -1) , r2_values)
+
+
+
+########  Plot the r2 values as the number of cycles remaining approaches the end #######
+
+##### plot the full range of each engine against the cycles to fail
+fig, ax = plt.subplots(1, 1, figsize=(14, 8))
+ax.scatter(range(len(r2_values)+1, 1, -1) , r2_values)
 plt.ylim(.7, 0)
 plt.show()
 
