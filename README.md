@@ -26,5 +26,9 @@ The second variable was optimized for a logistic model. The value for y was deri
 
 
 ## Models:
-
 Linear regression with knots and splines. 
+Each feature that was included in the training data set was graphed against cycles until failure and plotted with a smoothing line designed to show potential knots in each feature. These features where then to the original dataframe which was transformed using each of the knots as a new column.  The target variable was initially set at number of cycles until failure.
+
+Linear regression with a log transformed target variable.
+The plots of the first model indicated that the features contained data that was increasing/decreasing at a rate that was accelerating as the engines approached the end of their life cycle.  This is an indication that a log transformation would be useful. The first transformation was a log transformation of the y variable. Log variables started as high as 5.8 (350 cycles of life) and continued down to 0 (one life cycle remaining). The results where significantly improved.   
+
