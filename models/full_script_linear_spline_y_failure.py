@@ -80,7 +80,7 @@ def transform_dataframes_add_ys(data_list= [ ] , *args ):
         cycles_to_fail = []
         for total in max_cycles:
             for cycle in range(total, 0, -1):
-                y_failure.append( 1-(cycle/total) )
+                y_failure.append( (cycle/total) )
                 cycles_to_fail.append(cycle)
         # print(cycles_to_fail)
         len(cycles_to_fail)
@@ -291,21 +291,21 @@ test_eng_max_cycles
 ###########             Train to Cycles to Fail                ######################
 ###########@@@@@@@@    Toggle commments to change target   @@@@@########################
 
-## This will make the train test split for this model ####
-ytrain = df_new_train['cycles_to_fail']
-X_features = df_new_train[train_features]
-ytest = df_new_test['cycles_to_fail']
-X_test_feaures = df_new_test[train_features]
-
-
-
-
-# ###########                Train to y_failure (0-1)                ######################
 # ## This will make the train test split for this model ####
-# ytrain = df_new_train['y_failure']
+# ytrain = df_new_train['cycles_to_fail']
 # X_features = df_new_train[train_features]
-# ytest = df_new_test['y_failure']
+# ytest = df_new_test['cycles_to_fail']
 # X_test_feaures = df_new_test[train_features]
+
+
+
+
+###########                Train to y_failure (0-1)                ######################
+## This will make the train test split for this model ####
+ytrain = df_new_train['y_failure']
+X_features = df_new_train[train_features]
+ytest = df_new_test['y_failure']
+X_test_feaures = df_new_test[train_features]
 
 
 
@@ -587,13 +587,15 @@ y_hat = y_hat   # np.exp(y_hat)                ## <----- note: the exp to transf
 
 
 ####  Plot predictions from data against the actual values ########
-x = list(range(1,320))
+x = list(range(0,3))
 y = x
 plt.scatter(y_hat, ytrain, alpha = 0.1, color='blue')
 plt.plot(x, y, '-r', label='y=2x+1')
-plt.title('Pipline Predictions with log(y)')
+plt.title('Pipline Predictions (Useful Life)')
 plt.xlabel('y hat from training set')
 plt.ylabel( 'y actuals from training set')
+plt.ylim(-0.1, 1.2)
+plt.xlim(-0.1, 1.2)
 plt.show()
 ###
 
@@ -633,6 +635,8 @@ for idx, ax in enumerate(axs.flatten()):
     end_idx = start_idx + train_eng_max_cycles[idx]
     print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
     # fig, ax = plt.subplots(figsize=(15,15) )
+    # ax.plot(y_hat[start_idx : end_idx], list(range(train_eng_max_cycles[idx], 0, -1)), '.r', label='predicted')
+    # ax.plot(ytrain[start_idx : end_idx] , list(range(train_eng_max_cycles[idx], 0, -1)) , '-b' , label='actual')
     ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
     ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '-b' , label='actual')
     ax.set_title("Engine # " + str(train_engines[idx]), size=6)
@@ -643,10 +647,10 @@ for idx, ax in enumerate(axs.flatten()):
     # plt.xlabel('Index')
     # plt.ylabel( 'Cycles to Fail')
     # ax.legend()
+    ax.set_ylim(0, 1.1)
+    ax.set_xlim(350 ,  0)
     ax.xaxis.set_tick_params(labelsize=5)
     ax.yaxis.set_tick_params(labelsize=5)
-    ax.set_ylim([0,350])
-    ax.set_xlim([350, 0])
     start_idx = end_idx 
         # plt.show()
 
@@ -655,7 +659,7 @@ for idx, ax in enumerate(axs.flatten()):
 plt.show()
 
 
-np.mean(train_eng_max_cycles)
+
 
 
 #### Third plot that will show the difference from actuals vs pred for
@@ -745,10 +749,10 @@ r2_values = r2_generator_last_n_cycles(y_hat , ytrain, 200)
 fig, ax = plt.subplots(1, 1, figsize=(13, 13))
 ax.scatter(range(len(r2_values)+1, 1, -1) , r2_values)
 plt.ylim(-2, 1)
-plt.xlim(len(r2_values), 0)
 plt.title('R Squared')
 plt.xlabel('Cycles to Fail')
 plt.ylabel( 'R Squared Value')
+plt.legend()
 plt.show()
 
 ### Plot of r-squared as the number of observations approaches 1  #########

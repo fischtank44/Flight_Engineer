@@ -10,9 +10,12 @@ from regression_tools.dftransformers import (
     FeatureUnion, 
     MapFeature,
     StandardScaler)
+from scipy import stats
 from plot_univariate import plot_one_univariate
 from pandas.tools.plotting import scatter_matrix
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import (
+    LinearRegression,
+    LogisticRegression)
 from sklearn.model_selection import train_test_split
 from basis_expansions.basis_expansions import (
     Polynomial, LinearSpline)
@@ -32,6 +35,9 @@ from math import ceil
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error as mse
 from sklearn.metrics import r2_score as r2
+from r_squared_funcs import (
+    r2_for_last_n_cycles,
+    r2_generator_last_n_cycles)
 from sklearn.pipeline import Pipeline
 from sklearn.utils import resample
 from basis_expansions.basis_expansions import NaturalCubicSpline
@@ -112,71 +118,32 @@ col = ['unit', 'time_cycles', 'op_set_1', 'op_set_2', 'op_set_3', 't2_Inlet',
 
 ############  Start of data analysis   #############
 
-
-
-##### plot scatter plot for all features    #####
-pd.tools.plotting.scatter_matrix(df1[col], figsize=(10, 10), s=100, alpha=.3)
-plt.show()
-
-
-
-
-## this will plot all columns to check for variation within the feature data
-for name in col:
-    df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
-    plt.show()
-
-
 ######     Several features appear to not be predictive  ######
 
 #   limit the features that are in the model scatter plot #####
-small_features_list = ['time_cycles', 't24_lpc', 't30_hpc', 't50_lpt', 
+
+
+#####         Scatter matrix using cycles to fail        #####
+small_features_list = ['y_failure' , 't24_lpc', 't30_hpc', 't50_lpt', 
     'p30_hpc', 'nf_fan_speed', 'nc_core_speed', 'ps_30_sta_press', 
     'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
     'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl' ]
 
-#####     Below is the cycles to fail columns        ##### 
 
-_ = scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
+scatter_matrix = pd.scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
+for ax in scatter_matrix.ravel():
+    ax.set_xlabel(ax.get_xlabel(), fontsize = 6, rotation = 90)
+    ax.set_ylabel(ax.get_ylabel(), fontsize = 6, rotation = 0)
+
 plt.show()
 
-
-#   limit the features that are in the model scatter plot #####
-small_features_list = ['cycles_to_fail' , 't24_lpc', 't30_hpc', 't50_lpt', 
-    'p30_hpc', 'nf_fan_speed', 'nc_core_speed', 'ps_30_sta_press', 
-    'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
-    'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl' ]
-
-_ = scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
-plt.show()
 
 #####                                                       ##### 
 
-
-#    view the description of each column 
-col = df1.columns
-# col = train_features
-for c in col:
-  print (df1[c].describe() ) 
-
-
-### This will print only the standard deviation for each column
-col = df1.columns
-for c in col:
-  print (df1[c].describe()[2] ) 
-
-
-### This will remove features based the standard deviation for each column
-train_features = []
-limit = .01
-col = df1.columns
-for c in col:
-  if (df1[c].describe()[2] ) >= .01:
-      train_features.append(c)
-train_features
+####   Created the short list of features to train to ######
 
 #### List of features to train the model to  #######    ### remove 'unit'
-train_features = [ 't24_lpc', 't30_hpc', 't50_lpt', 
+train_features = ['time_cycles', 't24_lpc', 't30_hpc', 't50_lpt', 
     'p30_hpc', 'nf_fan_speed', 'nc_core_speed', 'ps_30_sta_press', 
     'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
     'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl']
@@ -185,39 +152,27 @@ train_features = [ 't24_lpc', 't30_hpc', 't50_lpt',
 #######    the columns time_cycles and time_to_fail have been removed ##
 
 
-####  The time cycles column may be used as an alternate y value to train to
-# y_cycles_to_fail_mean = np.mean(df1.cycles_to_fail)
-# y_cycles_to_fail_mean
-df1.head()
-y_cycles_to_fail = np.log(df1.cycles_to_fail)
-y_time_cycles = df1.time_cycles
-####
-# 
-# Train logistic model to y_failure mean cycles: y_cycles_to_fail_mean
-#  108.80786195530997                                                              #### 
-y_failure 
-
 ##   view plots for the features that are to be used in df1   ######
-# for name in train_features:
-#     df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
-#     plt.show()
+for name in train_features:
+    df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
+    plt.show()
 
 
 
-# #### remove features that do not change at all for this dataset
-# for c in col:
-#     df1[c].describe()
+#### remove features that do not change at all for this dataset
+for c in col:
+    df1[c].describe()
 
 #####   adjust the data frame to choose 20 % of the engines by unmber and 
 #####   train to a sample of 80% by number and 20% saved for test data.
 # engines = list(np.random.choice(range(1,101), 20, replace= False))
 test_engines = [4, 18, 19, 21, 28, 33, 42, 45, 46, 50, 61, 73, 74, 78, 82, 83, 84, 86, 92, 94]
 
-# train_engines = []
-# for num in range(1,101):
-#     if num not in test_engines:
-#         train_engines.append(num)
-#         #
+train_engines = []
+for num in range(1,101):
+    if num not in test_engines:
+        train_engines.append(num)
+#        #
 
 
 train_engines = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 22, 23, 24, 25, 26, 
@@ -227,7 +182,11 @@ train_engines = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 22,
 
 train_engines
 test_engines
-
+# for eng in train_engines:
+#     if eng in test_engines:
+#         print(True)
+#     else:
+#         print(False)
 
 
 test_idx = df1['unit'].apply(lambda x: x in test_engines)
@@ -248,10 +207,40 @@ df_new_train = df1.iloc[train_list].copy()
 df_new_test.shape
 df_new_train.shape
 
+df_new_test.head()
+df_new_train.head()
+
+###### this will make a list of the max number of cycles for the training set of engines
+##     
+
+train_eng_max_cycles = []
+for e in train_engines:
+    train_eng_max_cycles.append(max(df1['time_cycles'][df1['unit']==e]))
+
+train_eng_max_cycles
+stats.describe(train_eng_max_cycles)
+#  DescribeResult(nobs=80, minmax=(128, 362), 
+#  mean=203.4375, variance=2055.6922468354433, 
+#  skewness=1.063155863408599, kurtosis=1.5047506637832253)
+
+
+#######  the max number of cycles for the test set of engines  ########
+test_eng_max_cycles = []
+for e in test_engines:
+    test_eng_max_cycles.append(max(df1['time_cycles'][df1['unit']==e]))
+
+test_eng_max_cycles
+    
+
+
+
+
 
 ## This will make the train test split for the model ####
 ytrain = df_new_train['y_failure']
 X_features = df_new_train[train_features]
+ytest = df_new_test['y_failure']
+X_test_feaures = df_new_test[train_features]
 
 ### Hold for future use  #######
 # Xtrain, Xtest, ytrain, ytest = train_test_split(X_features, y, test_size = .2, random_state=137)
@@ -263,10 +252,10 @@ X_features = df_new_train[train_features]
 
 ###   The train test split will include all engines for the start   ####  
 
-# #LINEAR: 
-# L_model = LinearRegression(fit_intercept=True)
-# L_model.fit(X_features, ytrain)
-# L_y_predicted = L_model.predict(X_features)
+#logistic:                                            <-----   log model
+Log_model = LogisticRegression(fit_intercept=True)
+Log_model.fit(X_features, ytrain)
+L_y_predicted = Log_model.predict(X_features)
 
 
 # L_y_predicted
@@ -343,7 +332,9 @@ X_features = df_new_train[train_features]
 
 
 # Begin spline analysis of each significant feature
-# plot the full range of each engine against the cycles to fail
+
+
+###### plot the full range of each engine against the cycles to fail
 fig, axs = plt.subplots(3, 5, figsize=(14, 8))
 univariate_plot_names = df1[train_features]                                     #columns[:-1]
 
@@ -352,7 +343,8 @@ for name, ax in zip(univariate_plot_names, axs.flatten()):
                            df1['cycles_to_fail'],
                            df1[name].values.reshape(-1, 1),
                            bootstrap=100)
-    ax.set_title(name)
+    ax.set_title(name, fontsize=7)
+
 plt.show()
 
 
@@ -378,7 +370,9 @@ for col in train_features:
 
 train_features
 
-train_features = ['t24_lpc', 
+train_features = 
+['time_cycles', 
+'t24_lpc', 
 't30_hpc', 
 't50_lpt', 
 'p30_hpc', 
@@ -392,6 +386,12 @@ train_features = ['t24_lpc',
 'htbleed_enthalpy', 
 'w31_hpt_cool_bl', 
 'w32_lpt_cool_bl']
+
+
+cycle_fit = Pipeline([
+    ('time_cycles', ColumnSelector(name='time_cycles')),
+    ('time_cycles_spline', LinearSpline(knots=[25, 50, 75, 120, 175 , 220, 240, 260, 280, 300, 320]))
+])
 
 
 t24_fit = Pipeline([
@@ -475,6 +475,7 @@ w32_fit = Pipeline([
 
 
 feature_pipeline = FeatureUnion([
+    ('time_cycles', cycle_fit),
     ('t24_lpc', t24_fit),
     ('t30_hpc', t30_fit),
     ('p30_hpc', p30_fit),
@@ -506,23 +507,30 @@ features = feature_pipeline.transform(df_new_train)
 
 ###    Fit model to the pipeline   #######
 model = LinearRegression(fit_intercept=True)
-model.fit(features.values, ytrain)
+model.fit(features.values, ytrain)   #np.log(ytrain) # <---- note: the np.log transformation
 
+len(ytrain)
+len(X_features)
 
 #### View the coefficients
 display_coef(model, features.columns)
+
+plt.plot(range(0,len(model.coef_)), model.coef_)
+plt.show()
 
 
 
 ####  Make predictions against the training set
 y_hat = model.predict(features.values)
+y_hat = y_hat   # np.exp(y_hat)                ## <----- note: the exp to transform back
+
 
 ####  Plot predictions from data against the actual values ########
 x = list(range(1,320))
 y = x
 plt.scatter(y_hat, ytrain, alpha = 0.1, color='blue')
 plt.plot(x, y, '-r', label='y=2x+1')
-plt.title('First Pipline Predictions')
+plt.title('Pipline Predictions with log(y)')
 plt.xlabel('y hat from training set')
 plt.ylabel( 'y actuals from training set')
 plt.show()
@@ -545,15 +553,6 @@ plt.show()
 ##########################################
 
 
-train_eng_max_cycles = []
-for e in train_engines:
-    train_eng_max_cycles.append(max(df1['time_cycles'][df1['unit']==e]))
-
-# run
-
-train_eng_max_cycles
- 
- 
     # #print(num)
     # max_cycles.append(max(df['time_cycles'][df['unit']==num] ) )
 
@@ -614,13 +613,7 @@ for idx, e in enumerate(train_engines):
 
 
 
-#### Score of the first model against the training set.  
-## First score from basic linear regression model   ####
-first_knot_model = r2(ytrain, y_hat)
-first_knot_model
 
-# first_knot_model
-# 0.64194677350961
 
 
 ### This will function will create the actual estimations vs predicted values
@@ -641,5 +634,60 @@ fig, axs = plot_many_predicteds_vs_actuals(train_features, y_hat)
 # fig.tight_layout()df1
 plt.show()
 
+
+
+
+
+##########################    Scoreing Section   ###############
+
+
+
+#### Score of the first model against the training set.  
+## First score from basic linear regression model   ####
+log_knot_model = r2(ytrain, y_hat)
+log_knot_model
+# time_knot_model
+# first_knot_model
+# 0.64194677350961
+# 0.7396060171044228
+# log_knot_model
+# 0.7272227017732488
+#log_knot_model
+# 0.7273228097635444
+
+
+
+
+##### R-squared for the last n number of observations  #####
+#
+ytrain
+y_hat
+
+r2_for_last_n_cycles(y_hat , ytrain, last_n=150)
+r2_for_last_n_cycles(y_hat , ytrain, last_n=100)
+r2_for_last_n_cycles(y_hat , ytrain, last_n=75)
+r2_for_last_n_cycles(y_hat , ytrain, last_n=50)
+r2_for_last_n_cycles(y_hat , ytrain, last_n=25)
+r2_for_last_n_cycles(y_hat , ytrain, last_n=15)
+r2_for_last_n_cycles(y_hat , ytrain, last_n=10)
+r2_for_last_n_cycles(y_hat , ytrain, last_n=5)
+
+###################   Make a list of r squared values for plotting   ##########
+
+r2_values = r2_generator_last_n_cycles(y_hat , ytrain, 200)
+
+########  Plot the r2 values as the number of cycles remaining approaches the end #######
+
+##### plot the full against the cycles to fail
+fig, ax = plt.subplots(1, 1, figsize=(13, 13))
+ax.scatter(range(len(r2_values)+1, 1, -1) , r2_values)
+plt.ylim(-2, 1)
+plt.title('R Squared')
+plt.xlabel('Cycles to Fail')
+plt.ylabel( 'R Squared Value')
+plt.legend()
+plt.show()
+
+### Plot of r-squared as the number of observations approaches 1  #########
 
 
