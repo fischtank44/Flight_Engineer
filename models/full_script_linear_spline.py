@@ -569,7 +569,7 @@ x = list(range(1,320))
 y = x
 plt.scatter(y_hat, ytrain, alpha = 0.1, color='blue')
 plt.plot(x, y, '-r', label='y=2x+1')
-plt.title('First Pipline Predictions')
+plt.title('Pipline Predictions with log(y)')
 plt.xlabel('y hat from training set')
 plt.ylabel( 'y actuals from training set')
 plt.show()
