@@ -595,7 +595,7 @@ plt.title('Pipline Predictions (Useful Life)')
 plt.xlabel('y hat from training set')
 plt.ylabel( 'y actuals from training set')
 plt.ylim(-0.1, 1.2)
-plt.xlim(-0.1, 1.2)
+plt.xlim(1.1, -0.1)
 plt.show()
 ###
 
