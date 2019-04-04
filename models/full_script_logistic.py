@@ -625,6 +625,7 @@ for idx, e in enumerate(train_engines):
     plt.axvline(stats.describe(train_eng_max_cycles)[1][0], color='r', label='min' )
     plt.axvline(stats.describe(train_eng_max_cycles)[2], color='g' , label='avg' )
     plt.axvline(stats.describe(train_eng_max_cycles)[1][1], color='b' , label='max' )
+    plt.xlim(370,0)
     ax.legend()
     start_idx = end_idx 
     plt.show()

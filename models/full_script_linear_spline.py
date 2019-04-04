@@ -568,7 +568,7 @@ features = feature_pipeline.transform(df_new_train)
 
 ###    Fit model to the pipeline   #######
 model = LinearRegression(fit_intercept=True)
-model.fit(features.values, ytrain)   #np.log(ytrain) # <---- note: the np.log transformation
+model.fit(features.values, np.log(ytrain)) # <---- note: the np.log transformation
 
 len(ytrain)
 len(X_features)
@@ -583,7 +583,7 @@ plt.show()
 
 ####  Make predictions against the training set
 y_hat = model.predict(features.values)
-y_hat = y_hat   # np.exp(y_hat)                ## <----- note: the exp to transform back
+y_hat = np.exp(y_hat)                ## <----- note: the exp to transform back
 
 
 ####  Plot predictions from data against the actual values ########
@@ -668,8 +668,11 @@ for idx, e in enumerate(train_engines):
     ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
     ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '.b' , label='actual')
     plt.title('Engine #: ' + str(e))
-    plt.xlabel('Index')
-    plt.ylabel( 'Cycles to Fail')
+    plt.xlabel('Cycles to Fail')
+    plt.ylabel( 'Cycles Used')
+    plt.axvline(stats.describe(train_eng_max_cycles)[1][0], color='r', label='min' )
+    plt.axvline(stats.describe(train_eng_max_cycles)[2], color='g' , label='avg' )
+    plt.axvline(stats.describe(train_eng_max_cycles)[1][1], color='b' , label='max' )
     ax.legend()
     start_idx = end_idx 
     plt.show()
