@@ -573,11 +573,11 @@ model.fit(features.values, np.log(ytrain)) # <---- note: the np.log transformati
 len(ytrain)
 len(X_features)
 
-#### View the coefficients
-display_coef(model, features.columns)
+# #### View the coefficients
+# display_coef(model, features.columns)
 
-plt.plot(range(0,len(model.coef_)), model.coef_)
-plt.show()
+# plt.plot(range(0,len(model.coef_)), model.coef_)
+# plt.show()
 
 
 
@@ -673,6 +673,7 @@ for idx, e in enumerate(train_engines):
     plt.axvline(stats.describe(train_eng_max_cycles)[1][0], color='r', label='min' )
     plt.axvline(stats.describe(train_eng_max_cycles)[2], color='g' , label='avg' )
     plt.axvline(stats.describe(train_eng_max_cycles)[1][1], color='b' , label='max' )
+    
     ax.legend()
     start_idx = end_idx 
     plt.show()

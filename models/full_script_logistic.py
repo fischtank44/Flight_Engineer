@@ -237,12 +237,16 @@ test_eng_max_cycles
 plt.scatter(range(1, len(train_eng_max_cycles)+1), sort(train_eng_max_cycles))
 
 
-plt.scatter(sorted(train_eng_max_cycles), range(1, len(train_eng_max_cycles)+1) )
-plt.axvline(stats.describe(train_eng_max_cycles)[1][0], color='r' )
-plt.axvline(stats.describe(train_eng_max_cycles)[1][1], color='b')
-plt.axvline(stats.describe(train_eng_max_cycles)[2], color='g')
+plt.scatter(range(1, len(train_eng_max_cycles)+1) , sorted(train_eng_max_cycles)  )
+plt.axhline(stats.describe(train_eng_max_cycles)[1][0], color='r', label='min')
+plt.axhline(stats.describe(train_eng_max_cycles)[2], color='g', label='mean')
+plt.axhline(stats.describe(train_eng_max_cycles)[1][1], color='b' , label='max')
+plt.title("Max Life of 80 Training Engines")
+plt.ylabel('Number of Cycles')
+plt.xlabel( 'Engine Number')
 # vlines(x, ymin, ymax)
 # hlines(y, xmin, xmax)
+plt.legend()
 plt.show()
 
 stats.describe(train_eng_max_cycles)
@@ -580,7 +584,7 @@ plt.show()
 ##### this is the plot of all 80 engines on a single chart
 
 fig, axs = plt.subplots(8,10, figsize=(10,4))
-ax.set_title("Spline Model of 80 Training Engines")
+fig.suptitle("Spline Model of 80 Training Engines")
 start_idx = 0
 for idx, ax in enumerate(axs.flatten()):
 # for idx, e in enumerate(train_engines):
