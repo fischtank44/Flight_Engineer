@@ -73,10 +73,35 @@ df4 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/flight_engin
 ################   This will add a column for the y value which will be the number of cycles until the engine fails.
 
 
+
+small_features_list = [
+    'time_cycles', 
+    't24_lpc', 
+    't30_hpc', 
+    't50_lpt', 
+    'p30_hpc', 
+    'nf_fan_speed', 
+    'nc_core_speed', 
+    'ps_30_sta_press', 
+    'phi_fp_ps30', 
+    'nrf_cor_fan_sp', 
+    'nrc_core_sp', 
+    'bpr_bypass_rat', 
+    'htbleed_enthalpy', 
+    'w31_hpt_cool_bl', 
+    'w32_lpt_cool_bl']
+
+
+
 #######      List of vaiables and features for model    #######
 
 training_set = True
 make_plots = False
+data_frames_to_transform = [df1, df2, df3 , df4]
+transform_dataframes_add_ys(data_frames_to_transform)
+cols_to_use = small_features_list
+df = df1          #<----- #This is the dataframe to use for the model
+
 
 ##########################################################
 # It will be a countdown of the total cycles for training set  ######
@@ -84,7 +109,7 @@ make_plots = False
 #### add column to the end for logistic predictive model   ######
 #### 
 
-data_frames_to_transform = [df1, df2, df3 , df4]
+# data_frames_to_transform = [df1, df2, df3 , df4]
 
 # def transform_dataframes_add_ys(data_list= [ ] , *args ):
 # # dataf = df1
@@ -112,53 +137,29 @@ data_frames_to_transform = [df1, df2, df3 , df4]
 
 
 ###   Transform all four dataframes   #######
-transform_dataframes_add_ys(data_frames_to_transform)
+
 ############################
 
 
-
-
-
-
-# use column discribe out how remove the columns that do not change #### 
-
-col = df1.columns
-col = ['unit', 'time_cycles', 'op_set_1', 'op_set_2', 'op_set_3', 't2_Inlet',
-       't24_lpc', 't30_hpc', 't50_lpt', 'p2_fip', 'p15_pby', 'p30_hpc',
-       'nf_fan_speed', 'nc_core_speed', 'epr_p50_p2', 'ps_30_sta_press',
-       'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat',
-       'far_b_air_rat', 'htbleed_enthalpy', 'nf_dmd_dem_fan_sp', 'pcn_fr_dmd',
-       'w31_hpt_cool_bl', 'w32_lpt_cool_bl', 'cycles_to_fail']
 
 #####  End of data import file #######
 
 
 ############  Start of data analysis   #############
 
-
-
-
-
-
 ## this will plot all columns to check for variation within the feature data
 if make_plots==True:
     for name in col:
-        df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
+        df.plot.scatter( 'cycles_to_fail', name, alpha = .3)
         plt.show()
 #
 
+
+
 ######     Several features appear to not be predictive  ######
-
-#   limit the features that are in the model scatter plot #####
-small_features_list = ['time_cycles', 't24_lpc', 't30_hpc', 't50_lpt', 
-    'p30_hpc', 'nf_fan_speed', 'nc_core_speed', 'ps_30_sta_press', 
-    'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
-    'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl' ]
-
-
 #####     Scatter matrix using time cycles            ##### 
 if make_plots==True:
-    scatter_matrix = pd.scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
+    scatter_matrix = pd.scatter_matrix(df[cols_to_use], alpha=0.2, figsize=(20, 20), diagonal='kde')
 
 if make_plots==True:
     for ax in scatter_matrix.ravel():
@@ -169,13 +170,8 @@ if make_plots==True:
 
 
 #####         Scatter matrix using cycles to fail        #####
-small_features_list = ['cycles_to_fail' , 't24_lpc', 't30_hpc', 't50_lpt', 
-    'p30_hpc', 'nf_fan_speed', 'nc_core_speed', 'ps_30_sta_press', 
-    'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
-    'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl' ]
-
 if make_plots==True:
-    scatter_matrix = pd.scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
+    scatter_matrix = pd.scatter_matrix(df[cols_to_use], alpha=0.2, figsize=(20, 20), diagonal='kde')
 
 
 
@@ -191,58 +187,42 @@ if make_plots==True:
 
 
 #    view the description of each column 
-col = df1.columns
+col = df.columns
 # col = train_features
 for c in col:
-  print (df1[c].describe() ) 
+  print (df[c].describe() ) 
 
 
 ### This will print only the standard deviation for each column
-col = df1.columns
+col = df.columns
 for c in col:
-  print (df1[c].describe()[2] ) 
+  print (df[c].describe()[2] ) 
 
 
 ### This will remove features based the standard deviation for each column
 train_features = []
 limit = .01
-col = df1.columns
+col = df.columns
 for c in col:
-  if (df1[c].describe()[2] ) >= .01:
+  if (df[c].describe()[2] ) >= .01:
       train_features.append(c)
 train_features
 
-####   Created the short list of features to train to ######
 
-
-
-
-#### List of features to train the model to  #######    ### remove 'unit'
-train_features = ['time_cycles', 't24_lpc', 't30_hpc', 't50_lpt', 
-    'p30_hpc', 'nf_fan_speed', 'nc_core_speed', 'ps_30_sta_press', 
-    'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
-    'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl']
 
 ######    the training features has the columns to train to ### 
 #######    the columns time_cycles and time_to_fail have been removed ##
 
 
-####  The time cycles column may be used as an alternate y value to train to
-# y_cycles_to_fail =  df1.cycles_to_fail
-# y_time_cycles = df1.time_cycles
-####                                                                  #### 
-
-##   view plots for the features that are to be used in df1   ######
+##   view plots for the features that are to be used in df   ######
 if make_plots==True:
     for name in train_features:
-        df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
+        df.plot.scatter( 'cycles_to_fail', name, alpha = .3)
         plt.show()
 
-
-
 #### remove features that do not change at all for this dataset
-for c in df1.columns:
-    df1[c].describe()
+for c in df.columns:
+    df[c].describe()
 
 #####   adjust the data frame to choose 20 % of the engines by unmber and 
 #####   train to a sample of 80% by number and 20% saved for test data.
@@ -263,39 +243,32 @@ train_engines = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 22,
 
 train_engines
 test_engines
-# for eng in train_engines:
-#     if eng in test_engines:
-#         print(True)
-#     else:
-#         print(False)
 
 
-test_idx = df1['unit'].apply(lambda x: x in test_engines)
-train_idx = df1['unit'].apply(lambda x: x in train_engines)
+
+############  Find index numbers for the training and test sets    ###########   
+test_idx = df['unit'].apply(lambda x: x in test_engines)
+train_idx = df['unit'].apply(lambda x: x in train_engines)
 test_idx
 train_idx
 
-
-type(test_idx)
-type(train_idx)
 test_list = list(test_idx)
 train_list = list(train_idx)
 
 
-
-df_new_test = df1.iloc[test_list].copy()
-df_new_train = df1.iloc[train_list].copy()
+#### Create new data frames using seperate test and training engines   ##########
+df_new_test = df.iloc[test_list].copy()
+df_new_train = df.iloc[train_list].copy()
 df_new_test.shape
 df_new_train.shape
 
 
 
 ###### this will make a list of the max number of cycles for the training set of engines
-##     
 
 train_eng_max_cycles = []
 for e in train_engines:
-    train_eng_max_cycles.append(max(df1['time_cycles'][df1['unit']==e]))
+    train_eng_max_cycles.append(max(df['time_cycles'][df['unit']==e]))
 
 train_eng_max_cycles
 stats.describe(train_eng_max_cycles)
@@ -304,22 +277,25 @@ stats.describe(train_eng_max_cycles)
 #  skewness=1.063155863408599, kurtosis=1.5047506637832253)
 
 
+
 #######  the max number of cycles for the test set of engines  ########
 test_eng_max_cycles = []
 for e in test_engines:
-    test_eng_max_cycles.append(max(df1['time_cycles'][df1['unit']==e]))
+    test_eng_max_cycles.append(max(df['time_cycles'][df['unit']==e]))
 
 test_eng_max_cycles
-
-
+stats.describe(test_eng_max_cycles)
+# DescribeResult(nobs=20, minmax=(158, 341), 
+# mean=217.8, variance=2469.326315789474, 
+# skewness=0.8514362921848939, kurtosis=-0.005870492535239968)
 
 
 ### Show the max number of cycles for each unit in all of the sets. ######### 
 
 all_eng_max_cycles = []
 
-for e in range(1, max(df1.unit)+1):
-    all_eng_max_cycles.append(max(df1['time_cycles'][df1['unit']==e]))
+for e in range(1, max(df.unit)+1):
+    all_eng_max_cycles.append(max(df['time_cycles'][df['unit']==e]))
 
 all_eng_max_cycles
 
@@ -327,9 +303,10 @@ all_eng_max_cycles
 ###########             Train to Cycles to Fail                ######################
 ###########@@@@@@@@    Toggle commments to change target   @@@@@########################
 
+
 ## This will make the train test split for this model ####
 ytrain = df_new_train['cycles_to_fail']
-X_features = df_new_train[train_features]
+X_train_features = df_new_train[train_features]
 ytest = df_new_test['cycles_to_fail']
 X_test_feaures = df_new_test[train_features]
 
@@ -338,7 +315,7 @@ X_test_feaures = df_new_test[train_features]
 # ###########                Train to y_failure (0-1)                ######################
 # ## This will make the train test split for this model ####
 # ytrain = df_new_train['y_failure']
-# X_features = df_new_train[train_features]
+# X_train_features = df_new_train[train_features]
 # ytest = df_new_test['y_failure']
 # X_test_feaures = df_new_test[train_features]
 
@@ -354,36 +331,7 @@ X_test_feaures = df_new_test[train_features]
 
 
 
-# L_y_predicted
-# ############ 
-# ######   Check the coefficients from the model 
-# L_model.coef_
-# print(list(zip(L_model.coef_, X_features)))
 
-
-##### Model from old train/test split
-# [(0.2098130774662108, 'unit'), (-7.173759447981604, 't24_lpc'), 
-# (-0.42305195925658207, 't30_hpc'), (-0.7441639445488603, 't50_lpt'), 
-# (7.61219378587503, 'p30_hpc'), (-12.147203483784747, 'nf_fan_speed'), 
-# (-0.3844533247091928, 'nc_core_speed'), (-34.641657728829905, 'ps_30_sta_press'),
-#  (11.105368284298036, 'phi_fp_ps30'), (-4.474447225499914, 'nrf_cor_fan_sp'), 
-#  (-0.20542361139388693, 'nrc_core_sp'), (-126.19522472669553, 'bpr_bypass_rat'), 
-#  (-1.9171623154921535, 'htbleed_enthalpy'), (22.12461560626438, 'w31_hpt_cool_bl'),
-#  (42.47336192785645, 'w32_lpt_cool_bl')]
-#
-#  Model from new 80 engine 20 test train/test split
-# #print(list(zip(L_model.coef_, X_features)))
-# [(-7.9993983227825884, 't24_lpc'), (-0.40343998913641343, 't30_hpc'), 
-# (-0.858069141166363, 't50_lpt'), (7.118138412200282, 'p30_hpc'), 
-# (-26.53526438485433, 'nf_fan_speed'), (-0.28820253265246504, 'nc_core_speed'), 
-# (-38.13957596837547, 'ps_30_sta_press'), (9.984072018801038, 'phi_fp_ps30'), 
-# (-21.747334830714323, 'nrf_cor_fan_sp'), (-0.28742611769798204, 'nrc_core_sp'), 
-# (-101.5927346354093, 'bpr_bypass_rat'), (-1.6264557877934611, 'htbleed_enthalpy'),
-#  (19.17595070701376, 'w31_hpt_cool_bl'), (42.100133123738566, 'w32_lpt_cool_bl')]
-#
-#
-#
-#
 # #####   Plot the data from the first model and evaluate the residuals
 
 # plt.scatter(L_y_predicted, ytrain, alpha = 0.1)
@@ -394,50 +342,15 @@ X_test_feaures = df_new_test[train_features]
 
 
 
-
-
-
-#### Second plot that will show the difference from actuals vs pred
-# fig = plt.figure()
-# fig, ax = plt.subplots(figsize=(15,15) )
-# ax.plot(list(range(1, len(L_y_predicted) + 1)) , L_y_predicted, '.r', label='predicted')
-# ax.plot(list(range(1, len(ytrain) + 1 )) , ytrain, '.b' , label='actual')
-# plt.xlabel('Index of Value')
-# plt.ylabel( 'Cycles to Fail')
-# ax.legend()
-# plt.show()
-
-### First score from basic linear regression model   ####
-# base_score = r2(ytrain, L_y_predicted)
-# base_score
-# linear_model_80_engine = base_score
-# linear_model_80_engine
-
-#####  score of model no tuning trained to time cycles to go
-##  0.5302416225409862
-
-#### score of model with no tuning trained to cycles remaining 
-##  0.5302416225409862
-##
-### There is no difference between the two which makes sense.
-
-####  Linear model 80 engine split 
-# linear_model_80_engine
-# 0.6004573742141459
-
-
-
 # Begin spline analysis of each significant feature
-
-
 ###### plot the full range of each engine against the cycles to fail
 if make_plots==True:
     fig, axs = plt.subplots(3, 5, figsize=(14, 8))
-    univariate_plot_names = df1[train_features]                                     #columns[:-1]
+    univariate_plot_names = df[train_features]                                     #columns[:-1]
     for name, ax in zip(univariate_plot_names, axs.flatten()):
         plot_univariate_smooth(ax,
-                            df1['cycles_to_fail'],
-                            df1[name].values.reshape(-1, 1),
+                            df['cycles_to_fail'],
+                            df[name].values.reshape(-1, 1),
                             bootstrap=100)
         ax.set_title(name, fontsize=7)
     plt.show()
@@ -449,38 +362,28 @@ if make_plots==True:
 if make_plots==True:
     for col in train_features:
         fig, ax = plt.subplots(figsize=(12, 3))
-        plot_one_univariate(ax, df1, 'cycles_to_fail', col )
+        plot_one_univariate(ax, df, 'cycles_to_fail', col )
         ax.set_title("Evaluation of: " + str(col))
         plt.xlabel(col)
         plt.ylabel( 'Cycles to Fail')
         plt.show()
 
-#### Begining of the linear spline transformation parameters    #######
-# linear_spline_transformer = LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300])
-
-# linear_spline_transformer.transform(df1['cycles_to_fail']).head()
-
-# cement_selector = ColumnSelector(name='cycles_to_fail')
-# cement_column = cement_selector.transform('cycles_to_fail')
-# linear_spline_transformer.transform(cement_column).head()
 
 train_features
 
-
-
 cycle_fit = Pipeline([
     ('time_cycles', ColumnSelector(name='time_cycles')),
-    ('time_cycles_spline', LinearSpline(knots=[25, 50, 75, 120, 175 , 220, 240, 260, 280, 300, 320, 370]))
+    ('time_cycles_spline', LinearSpline(knots=[25, 50, 75, 120, 175 , 220, 240, 260, 280, 300]))
 ])
 
 t24_fit = Pipeline([
     ('t24_lpc', ColumnSelector(name='t24_lpc')),
-    ('t24_lpc_spline', LinearSpline(knots=[641.5, 642,  642.5, 643.0 , 643.4, 644, 644.5]))
+    ('t24_lpc_spline', LinearSpline(knots=[641.5, 642,  642.5, 643.0 , 643.4, 644]))
 ])
 
 t30_fit = Pipeline([
     ('t30_hpc', ColumnSelector(name='t30_hpc')),
-    ('t30_hpc_spline', LinearSpline(knots=[1573 , 1580, 1584, 1588, 1593, 1598 , 1610]))
+    ('t30_hpc_spline', LinearSpline(knots=[ 1580, 1584, 1588, 1593, 1598 , 1610]))
 ])
 
 t50_fit = Pipeline([
@@ -490,27 +393,27 @@ t50_fit = Pipeline([
 
 p30_fit = Pipeline([
     ('p30_hpc', ColumnSelector(name='p30_hpc')),
-    ('p30_hpc_spline', LinearSpline(knots=[550, 552.2, 553.2, 554.8, 555, 555.5]))
+    ('p30_hpc_spline', LinearSpline(knots=[ 552.2, 553.2, 554.8, 555, 555.5]))
 ])
 
 nf_fan_fit = Pipeline([
     ('nf_fan_speed', ColumnSelector(name='nf_fan_speed')),
-    ('nf_fan_speed_spline', LinearSpline(knots=[2387.9, 2388, 2388.1, 2388.15, 2388.2, 2388.3, 2388.4]))
+    ('nf_fan_speed_spline', LinearSpline(knots=[2387.9, 2388, 2388.1, 2388.15, 2388.2, 2388.3]))
 ])
 
 nc_core_fit = Pipeline([
     ('nc_core_speed', ColumnSelector(name='nc_core_speed')),
-    ('nc_core_speed_spline', LinearSpline(knots=[9030, 9040, 9060, 9070, 9080, 9090]))
+    ('nc_core_speed_spline', LinearSpline(knots=[ 9040, 9060, 9070, 9080, 9090]))
 ])
 
 ps_30_fit = Pipeline([
     ('ps_30_sta_press', ColumnSelector(name='ps_30_sta_press')),
-    ('ps_30_sta_press_spline', LinearSpline(knots=[47, 47.2, 47.3, 47.45, 47.6, 47.8, 47.9, 48.25]))
+    ('ps_30_sta_press_spline', LinearSpline(knots=[47, 47.2, 47.3, 47.45, 47.6, 47.8, 47.9]))
 ])
 
 phi_fp_fit = Pipeline([
     ('phi_fp_ps30', ColumnSelector(name='phi_fp_ps30')),
-    ('phi_fp_ps30_spline', LinearSpline(knots=[519, 520, 520.4 , 521.2, 522, 522.4, 523]))
+    ('phi_fp_ps30_spline', LinearSpline(knots=[ 520, 520.4 , 521.2, 522, 522.4, 523]))
 ])
 
 nrf_cor_fit = Pipeline([
@@ -525,7 +428,7 @@ nrc_core_fit = Pipeline([
 
 bpr_bypass_fit = Pipeline([
     ('bpr_bypass_rat', ColumnSelector(name='bpr_bypass_rat')),
-    ('bpr_bypass_rat_spline', LinearSpline(knots=[8.35 , 8.38, 8.41, 8.45, 8.49, 8.55]))
+    ('bpr_bypass_rat_spline', LinearSpline(knots=[8.35 , 8.38, 8.41, 8.45, 8.49]))
 ])
 
 
@@ -536,12 +439,12 @@ htbleed_fit = Pipeline([
 
 w31_fit = Pipeline([
     ('w31_hpt_cool_bl', ColumnSelector(name='w31_hpt_cool_bl')),
-    ('w31_hpt_cool_bl_spline', LinearSpline(knots=[38.2, 38.5, 38.7, 38.9, 39.1, 39.2]))
+    ('w31_hpt_cool_bl_spline', LinearSpline(knots=[38.5, 38.7, 38.9, 39.1, 39.2]))
 ])
 
 w32_fit = Pipeline([
     ('w32_lpt_cool_bl', ColumnSelector(name='w32_lpt_cool_bl')),
-    ('w32_lpt_cool_bl_spline', LinearSpline(knots=[22.95, 23.14, 23.2,  23.32, 23.44]))
+    ('w32_lpt_cool_bl_spline', LinearSpline(knots=[ 23.14, 23.2,  23.32, 23.44]))
 ])
 
 
@@ -572,11 +475,12 @@ feature_pipeline = FeatureUnion([
 #### Build out the new dataframes with each knot  
 # 
 # 
-# ####   Test for full transformation of data frame  ##########
-feature_pipeline.fit(df1)
-features_f = feature_pipeline.transform(df1)
+# ####   Full transformation of data frame  using pipline ##########
+# feature_pipeline.fit(df)
+# features = feature_pipeline.transform(df)
 
 #########################################################
+
 
   #### Must use the 80 engine traing set !!!!!!!   
 if df_new_train==True:
@@ -586,9 +490,6 @@ if df_new_train==True:
 ####################################################
 
   
-
-
-
 # #### Build out the new dataframes with each knot   
 # #### Must use the 20 engine test set !!!!!!!   
 if df_new_train==False:
@@ -604,13 +505,10 @@ model = LinearRegression(fit_intercept=True)
 model.fit(features.values, np.log(ytrain)) # <---- note: the np.log transformation
 
 len(ytest)
+len(ytrain)
 len(X_test_features)
+len(X_train_features)
 
-# #### View the coefficients
-# display_coef(model, features.columns)
-
-# plt.plot(range(0,len(model.coef_)), model.coef_)
-# plt.show()
 
 
 ####  Make predictions against the training set
@@ -633,8 +531,6 @@ if make_plots==True:
 
 
 
-
-
 #### Second plot that will show the difference from actuals vs pred for the pipeline model   ###### 
 if make_plots==True:
     fig, ax = plt.subplots(figsize=(15,15) )
@@ -647,14 +543,6 @@ if make_plots==True:
 
 ##########################################
 
-
-    # #print(num)
-    # max_cycles.append(max(df['time_cycles'][df['unit']==num] ) )
-
-
-
-
-    # ax.set_title('Plot number {}'.format(i))
 
 
 ##### this is the plot of all 80 engines on a single chart  #####
@@ -686,9 +574,8 @@ if make_plots==True and training_set==True:
         start_idx = end_idx 
     plt.show()
 
-
-
               ################################
+
 
 ##### Test Set of data    ###############################
 ##### this is the plot of all 20 test engines on a single chart
@@ -723,6 +610,7 @@ if make_plots==True and training_set==False:
 
 
 
+
 test_eng_max_cycles
 train_eng_max_cycles
 
@@ -730,6 +618,7 @@ train_eng_max_cycles
 
 
 np.mean(train_eng_max_cycles)
+np.mean(test_eng_max_cycles)
 
 
 #### Third plot that will show the difference from actuals vs pred for
@@ -781,17 +670,25 @@ if make_plots==True and training_set==False:
 
 
 ### This will plot the final estimations vs the actual data
-train_features
-# y_hat = model.predict(features.values)
+
+
+y_hat = model.predict(df_new_train.values )
+
+
+
 
 if make_plots==True and training_set==True:
     fig, axs = plot_many_predicteds_vs_actuals(train_features, y_hat)
-    # fig.tight_layout()df1
+    # fig.tight_layout()df
     plt.show()
 
-
-
-
+fig, axs = plot_many_predicteds_vs_actuals(train_features, y_hat)
+    # fig.tight_layout()df
+plt.show()
+len(y_hat)
+len(train_features)
+train_features
+len(df_new_train)
 
 ##########################    Scoreing Section   ###############
 
@@ -853,9 +750,6 @@ plt.show()
 
 ####################################################
 ####   Test for full transformation of data frame  ##########
-feature_pipeline.fit(df1)
-features_f = feature_pipeline.transform(df1)
-
 
 
 
@@ -864,31 +758,62 @@ features_f = feature_pipeline.transform(df1)
 # This creates a list of models, one for each bootstrap sample.
 
 
+feature_pipeline.fit(df_new_train)
+features_f = feature_pipeline.transform(df_new_train)
+
+
+model = LinearRegression(fit_intercept=True)
+model.fit(features_f.values, np.log(df_new_train['cycles_to_fail'])) 
+
+cols_to_use = [
+    'time_cycles', 
+    't24_lpc', 
+    't30_hpc', 
+    't50_lpt', 
+    'p30_hpc', 
+    'nf_fan_speed', 
+    'nc_core_speed', 
+    'ps_30_sta_press', 
+    'phi_fp_ps30', 
+    'nrf_cor_fan_sp', 
+    'nrc_core_sp', 
+    'bpr_bypass_rat', 
+    'htbleed_enthalpy', 
+    'w31_hpt_cool_bl', 
+    'w32_lpt_cool_bl']
+
+
+# feature_pipeline.fit(df)
+# features = feature_pipeline.transform(df)
+
 models = bootstrap_train(
     LinearRegression, 
     features_f.values, 
-    df1['cycles_to_fail'],
+    np.log(df_new_train['cycles_to_fail'].values),
+    bootstraps=500,
     fit_intercept=True
 )
 
 
-fig, axs = plot_bootstrap_coefs(models, features.columns, n_col=4)
-plt.show()
+# fig, axs = plot_bootstrap_coefs(models, features.columns, n_col=4)
+# plt.show()
 
-
-len(small_features_list)
-small_features_list
 
 fig, axs = plot_partial_dependences(
      model, 
-     X=df1,
-     var_names=small_features_list,
+     X=df_new_train,
+     var_names=cols_to_use,
      pipeline=feature_pipeline,
      bootstrap_models=models,
-     y=df1['cycles_to_fail']  )
+     y=None#np.log(df['cycles_to_fail']).values  
+     )
 # fig.tight_layout()
 plt.show()
 
+
+
 df_new_train.head()
+df_new_train.shape
+
 
 
