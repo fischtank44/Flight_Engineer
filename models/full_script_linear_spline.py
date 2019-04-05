@@ -599,7 +599,11 @@ features = feature_pipeline.transform(df_new_test)
 
 ###    Fit model to the pipeline   #######
 model = LinearRegression(fit_intercept=True)
+<<<<<<< HEAD
 model.fit(X_features.values, np.log(ytrain)) # <---- note: the np.log transformation
+=======
+model.fit(X_test_features.values, np.log(ytest)) # <---- note: the np.log transformation
+>>>>>>> 8a7fb35e9261e3b8d8c8dfbc4cf692a21a3bcdf5
 
 len(ytest)
 len(X_test_features)
@@ -612,14 +616,18 @@ len(X_test_features)
 
 
 ####  Make predictions against the training set
+<<<<<<< HEAD
 y_hat = model.predict(X_features.values)
+=======
+y_hat = model.predict(X_test_features.values)
+>>>>>>> 8a7fb35e9261e3b8d8c8dfbc4cf692a21a3bcdf5
 y_hat = np.exp(y_hat)                ## <----- note: the exp to transform back
 
 
 ####  Plot predictions from data against the actual values ########
 x = list(range( 1,360))
 y = x
-plt.scatter(y_hat, ytrain, alpha = 0.1, color='blue')
+plt.scatter(y_hat, ytest, alpha = 0.1, color='blue')
 plt.plot(x, y, '-r', label='y=2x+1')
 plt.title('Pipline Predictions with log(y)')
 plt.xlabel('y hat from training set')
