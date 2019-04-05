@@ -1,4 +1,6 @@
-# python
+python
+
+###########
 import numpy as np
 import pandas as pd
 # from pandas.plotting import scatter_matrix
@@ -203,7 +205,7 @@ train_features = ['time_cycles', 't24_lpc', 't30_hpc', 't50_lpt',
 
 
 ####  The time cycles column may be used as an alternate y value to train to
-y_cycles_to_fail =  df1.cycles_to_fail
+# y_cycles_to_fail =  df1.cycles_to_fail
 # y_time_cycles = df1.time_cycles
 ####                                                                  #### 
 
@@ -305,7 +307,7 @@ test_eng_max_cycles
 ytrain = df_new_train['y_failure']
 X_features = df_new_train[train_features]
 ytest = df_new_test['y_failure']
-X_test_feaures = df_new_test[train_features]
+X_test_features = df_new_test[train_features]
 
 
 
@@ -559,19 +561,26 @@ feature_pipeline = FeatureUnion([
 #### Build out the new dataframes with each knot   
 #### Must use the 80 engine traing set !!!!!!!   
 
-feature_pipeline.fit(df_new_train)
-features = feature_pipeline.transform(df_new_train)
+feature_pipeline.fit(df_new_test)
+features = feature_pipeline.transform(df_new_test)
 
 
 #####   
 
 
 ###    Fit model to the pipeline   #######
-model = LinearRegression(fit_intercept=True)
-model.fit(features.values, ytrain)   #np.log(ytrain) # <---- note: the np.log transformation
 
-len(ytrain)
-len(X_features)
+ytest
+X_test_features
+
+model = LinearRegression(fit_intercept=True)
+model.fit(X_test_feaures.values, ytest)   #np.log(ytrain) # <---- note: the np.log transformation
+
+
+
+
+len(ytest)
+len(X_test_features)
 
 #### View the coefficients
 display_coef(model, features.columns)
@@ -582,14 +591,14 @@ plt.show()
 
 
 ####  Make predictions against the training set
-y_hat = model.predict(features.values)
+y_hat = model.predict(X_test_features.values)
 y_hat = y_hat   # np.exp(y_hat)                ## <----- note: the exp to transform back
 
 
 ####  Plot predictions from data against the actual values ########
 x = list(range(0,3))
 y = x
-plt.scatter(y_hat, ytrain, alpha = 0.1, color='blue')
+plt.scatter(y_hat, ytest, alpha = 0.1, color='blue')
 plt.plot(x, y, '-r', label='y=2x+1')
 plt.title('Pipline Predictions (Useful Life)')
 plt.xlabel('y hat from training set')
@@ -607,7 +616,7 @@ plt.show()
 
 fig, ax = plt.subplots(figsize=(15,15) )
 ax.plot(list(range(1, len(y_hat) + 1)) , y_hat, '.r', label='predicted')
-ax.plot(list(range(1, len(ytrain) + 1 )) , ytrain, '.b' , label='actual')
+ax.plot(list(range(1, len(ytest) + 1 )) , ytest, '.b' , label='actual')
 plt.xlabel('Index of Value')
 plt.ylabel( 'Cycles to Fail')
 ax.legend()
@@ -660,6 +669,41 @@ plt.show()
 
 
 
+##### Test Set of data    ###############################
+##### this is the plot of all 20 test engines on a single chart
+
+fig, axs = plt.subplots(4, 5 , figsize=(10,4))
+ax.set_title("Spline Model of 20 Test Engines")
+start_idx = 0
+for idx, ax in enumerate(axs.flatten()):
+# for idx, e in enumerate(train_engines):
+    end_idx = start_idx + test_eng_max_cycles[idx]
+    print(start_idx, end_idx, test_eng_max_cycles[idx], end_idx-start_idx)
+    # fig, ax = plt.subplots(figsize=(15,15) )
+    # ax.plot(y_hat[start_idx : end_idx], list(range(train_eng_max_cycles[idx], 0, -1)), '.r', label='predicted')
+    # ax.plot(ytrain[start_idx : end_idx] , list(range(train_eng_max_cycles[idx], 0, -1)) , '-b' , label='actual')
+    ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
+    ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , ytest[start_idx : end_idx] , '-b' , label='actual')
+    ax.set_title("Engine # " + str(test_engines[idx]), size=6)
+    # plt.tick_params(axis='both', which='major', labelsize=8)
+    # plt.tick_params(axis='both', which='minor', labelsize=6)
+    # plt.xticks(fontsize=8)      #, rotation=90)
+    # plt.title('Engine #: ' + str(train_engines[idx]))
+    # plt.xlabel('Index')
+    # plt.ylabel( 'Cycles to Fail')
+    # ax.legend()
+    ax.set_ylim(0, 1.1)
+    ax.set_xlim(350 ,  0)
+    ax.xaxis.set_tick_params(labelsize=5)
+    ax.yaxis.set_tick_params(labelsize=5)
+    start_idx = end_idx 
+        # plt.show()
+
+
+# plt.tight_layout()
+plt.show()
+
+
 
 
 #### Third plot that will show the difference from actuals vs pred for
@@ -674,6 +718,11 @@ for idx, e in enumerate(train_engines):
     plt.title('Engine #: ' + str(e))
     plt.xlabel('Index')
     plt.ylabel( 'Cycles to Fail')
+    # plt.axvline(stats.describe(train_eng_max_cycles)[1][0], color='r', label='min' )
+    # plt.axvline(stats.describe(train_eng_max_cycles)[2], color='g' , label='avg' )
+    # plt.axvline(stats.describe(train_eng_max_cycles)[1][1], color='b' , label='max' )
+    plt.xlim(350,0)
+    plt.ylim(0 , 1.1)
     ax.legend()
     start_idx = end_idx 
     plt.show()
@@ -756,5 +805,12 @@ plt.legend()
 plt.show()
 
 ### Plot of r-squared as the number of observations approaches 1  #########
+
+
+
+
+
+
+
 
 
