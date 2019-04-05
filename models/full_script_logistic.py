@@ -250,15 +250,17 @@ plt.legend()
 plt.show()
 
 stats.describe(train_eng_max_cycles)
+
+
 ##########################################################################
 
 
 
-## This will make the train test split for the model ####
-ytrain = df_new_train['y_failure']
-X_features = df_new_train[train_features]
-ytest = df_new_test['y_failure']
-X_test_feaures = df_new_test[train_features]
+# ## This will make the train test split for the model ####
+# ytrain = df_new_train['y_failure']
+# X_features = df_new_train[train_features]
+# ytest = df_new_test['y_failure']
+# X_test_feaures = df_new_test[train_features]
 
 ### Hold for future use  #######
 # Xtrain, Xtest, ytrain, ytest = train_test_split(X_features, y, test_size = .2, random_state=137)
@@ -523,12 +525,12 @@ features = feature_pipeline.transform(df_new_train)
 #####   
 
 
-###    Fit model to the pipeline   #######
-model = LinearRegression(fit_intercept=True)
-model.fit(features.values, ytrain)   #np.log(ytrain) # <---- note: the np.log transformation
+# ###    Fit model to the pipeline   #######
+# model = LinearRegression(fit_intercept=True)
+# model.fit(features.values, ytrain)   #np.log(ytrain) # <---- note: the np.log transformation
 
-len(ytrain)
-len(X_features)
+# len(ytrain)
+# len(X_features)
 
 # #### View the coefficients
 # display_coef(model, features.columns)
@@ -538,9 +540,9 @@ len(X_features)
 
 
 
-####  Make predictions against the training set
-y_hat = model.predict(features.values)
-y_hat = y_hat   # np.exp(y_hat)                ## <----- note: the exp to transform back
+# ####  Make predictions against the training set
+# y_hat = model.predict(features.values)
+# y_hat = y_hat   # np.exp(y_hat)                ## <----- note: the exp to transform back
 
 
 ####  Plot predictions from data against the actual values ########
@@ -549,7 +551,7 @@ x = list(range(0,1))
 y = x
 plt.scatter(y_hat, ytrain, alpha = 0.1, color='blue')
 plt.plot(x, y, '-r', label='y=2x+1')
-plt.title('Pipline Predictions with log(y)')
+plt.title('Pipline Predictions with logistic')
 plt.xlabel('y hat from training set')
 plt.ylabel( 'y actuals from training set')
 plt.show()

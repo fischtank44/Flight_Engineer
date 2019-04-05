@@ -1,4 +1,6 @@
-# python
+python
+
+#######
 import numpy as np
 import pandas as pd
 # from pandas.plotting import scatter_matrix
@@ -143,6 +145,7 @@ scatter_matrix = pd.scatter_matrix(df1[small_features_list], alpha=0.2, figsize=
 for ax in scatter_matrix.ravel():
     ax.set_xlabel(ax.get_xlabel(), fontsize = 6, rotation = 90)
     ax.set_ylabel(ax.get_ylabel(), fontsize = 6, rotation = 0)
+
 plt.show()
 
 
@@ -215,7 +218,7 @@ for name in train_features:
 
 
 #### remove features that do not change at all for this dataset
-for c in col:
+for c in df1.columns:
     df1[c].describe()
 
 #####   adjust the data frame to choose 20 % of the engines by unmber and 
@@ -284,8 +287,16 @@ for e in test_engines:
     test_eng_max_cycles.append(max(df1['time_cycles'][df1['unit']==e]))
 
 test_eng_max_cycles
-    
 
+
+
+
+### Show the max number of cycles for each unit in all of the sets. ######### 
+
+all_eng_max_cycles = []
+for e in range(1, max(df1.unit)+1):
+    all_eng_max_cycles.append(max(df1['time_cycles'][df1['unit']==e]))
+all_eng_max_cycles
 
 
 ###########             Train to Cycles to Fail                ######################
@@ -296,7 +307,6 @@ ytrain = df_new_train['cycles_to_fail']
 X_features = df_new_train[train_features]
 ytest = df_new_test['cycles_to_fail']
 X_test_feaures = df_new_test[train_features]
-
 
 
 
@@ -556,22 +566,43 @@ feature_pipeline = FeatureUnion([
 
 
 
-#### Build out the new dataframes with each knot   
+
+
+#### Build out the new dataframes with each knot  
+# 
+# 
+# ####   Test for full transformation of data frame  ##########
+feature_pipeline.fit(df1)
+features_f = feature_pipeline.transform(df1)
+
+#########################################################
 #### Must use the 80 engine traing set !!!!!!!   
 
 feature_pipeline.fit(df_new_train)
 features = feature_pipeline.transform(df_new_train)
 
+####################################################
 
-#####   
+  
+
+
+
+#### Build out the new dataframes with each knot   
+#### Must use the 20 engine test set !!!!!!!   
+
+feature_pipeline.fit(df_new_test)
+features = feature_pipeline.transform(df_new_test)
+
+##################################################
+
 
 
 ###    Fit model to the pipeline   #######
 model = LinearRegression(fit_intercept=True)
-model.fit(features.values, np.log(ytrain)) # <---- note: the np.log transformation
+model.fit(X_features.values, np.log(ytrain)) # <---- note: the np.log transformation
 
-len(ytrain)
-len(X_features)
+len(ytest)
+len(X_test_features)
 
 # #### View the coefficients
 # display_coef(model, features.columns)
@@ -580,20 +611,20 @@ len(X_features)
 # plt.show()
 
 
-
 ####  Make predictions against the training set
-y_hat = model.predict(features.values)
+y_hat = model.predict(X_features.values)
 y_hat = np.exp(y_hat)                ## <----- note: the exp to transform back
 
 
 ####  Plot predictions from data against the actual values ########
-x = list(range(1,320))
+x = list(range( 1,360))
 y = x
 plt.scatter(y_hat, ytrain, alpha = 0.1, color='blue')
 plt.plot(x, y, '-r', label='y=2x+1')
 plt.title('Pipline Predictions with log(y)')
 plt.xlabel('y hat from training set')
 plt.ylabel( 'y actuals from training set')
+plt.xlim(360,1)
 plt.show()
 ###
 
@@ -653,6 +684,51 @@ for idx, ax in enumerate(axs.flatten()):
 
 # plt.tight_layout()
 plt.show()
+
+
+
+################################
+
+##### Test Set of data    ###############################
+##### this is the plot of all 20 test engines on a single chart
+
+fig, axs = plt.subplots(4, 5 , figsize=(10,4))
+ax.set_title("Spline Model of 20 Test Engines")
+start_idx = 0
+for idx, ax in enumerate(axs.flatten()):
+# for idx, e in enumerate(train_engines):
+    end_idx = start_idx + test_eng_max_cycles[idx]
+    print(start_idx, end_idx, test_eng_max_cycles[idx], end_idx-start_idx)
+    # fig, ax = plt.subplots(figsize=(15,15) )
+    # ax.plot(y_hat[start_idx : end_idx], list(range(train_eng_max_cycles[idx], 0, -1)), '.r', label='predicted')
+    # ax.plot(ytrain[start_idx : end_idx] , list(range(train_eng_max_cycles[idx], 0, -1)) , '-b' , label='actual')
+    ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
+    ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , ytest[start_idx : end_idx] , '-b' , label='actual')
+    ax.set_title("Engine # " + str(test_engines[idx]), size=6)
+    # plt.tick_params(axis='both', which='major', labelsize=8)
+    # plt.tick_params(axis='both', which='minor', labelsize=6)
+    # plt.xticks(fontsize=8)      #, rotation=90)
+    # plt.title('Engine #: ' + str(train_engines[idx]))
+    # plt.xlabel('Index')
+    # plt.ylabel( 'Cycles to Fail')
+    # ax.legend()
+    ax.set_ylim( 0  , 350 )
+    ax.set_xlim(350 ,  0)
+    ax.xaxis.set_tick_params(labelsize=5)
+    ax.yaxis.set_tick_params(labelsize=5)
+    start_idx = end_idx 
+        # plt.show()
+
+
+# plt.tight_layout()
+plt.show()
+
+
+
+test_eng_max_cycles
+train_eng_max_cycles
+
+
 
 
 np.mean(train_eng_max_cycles)
@@ -756,5 +832,51 @@ plt.ylabel( 'R Squared Value')
 plt.show()
 
 ### Plot of r-squared as the number of observations approaches 1  #########
+
+
+
+
+
+
+
+####################################################
+####   Test for full transformation of data frame  ##########
+feature_pipeline.fit(df1)
+features_f = feature_pipeline.transform(df1)
+
+
+
+
+
+############################################################################
+# This creates a list of models, one for each bootstrap sample.
+
+
+models = bootstrap_train(
+    LinearRegression, 
+    features_f.values, 
+    df1['cycles_to_fail'],
+    fit_intercept=True
+)
+
+
+fig, axs = plot_bootstrap_coefs(models, features.columns, n_col=4)
+plt.show()
+
+
+len(small_features_list)
+small_features_list
+
+fig, axs = plot_partial_dependences(
+     model, 
+     X=df1,
+     var_names=small_features_list,
+     pipeline=feature_pipeline,
+     bootstrap_models=models,
+     y=df1['cycles_to_fail']  )
+# fig.tight_layout()
+plt.show()
+
+df_new_train.head()
 
 
