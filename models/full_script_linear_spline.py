@@ -43,6 +43,16 @@ from sklearn.utils import resample
 from basis_expansions.basis_expansions import NaturalCubicSpline
 import random
 
+#########################
+###### Self made functions######
+from r_squared_funcs import (
+    r2_for_last_n_cycles,
+    r2_generator_last_n_cycles)
+from enginedatatransformer import transform_dataframes_add_ys
+from plot_pred_vs_act import plot_many_predicteds_vs_actuals
+
+##################################
+
 import os
 os.getcwd()
 
@@ -63,6 +73,12 @@ df4 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/flight_engin
 ################   This will add a column for the y value which will be the number of cycles until the engine fails.
 
 
+#######      List of vaiables and features for model    #######
+
+training_set = True
+make_plots = False
+
+##########################################################
 # It will be a countdown of the total cycles for training set  ######
 ##  set dataf to dataframe name  ####
 #### add column to the end for logistic predictive model   ######
@@ -70,31 +86,32 @@ df4 = pd.read_csv('/home/superstinky/Seattle_g89/final_project_data/flight_engin
 
 data_frames_to_transform = [df1, df2, df3 , df4]
 
-def transform_dataframes_add_ys(data_list= [ ] , *args ):
-# dataf = df1
-    for df in data_list:
-        max_cycles = []
-        y_failure = []
-        for num in range(1, max(df['unit']) + 1):
-            #print(num)
-            max_cycles.append(max(df['time_cycles'][df['unit']==num] ) )
-            # max_cycles
-        cycles_to_fail = []
-        for total in max_cycles:
-            for cycle in range(total, 0, -1):
-                y_failure.append( 1-(cycle/total) )
-                cycles_to_fail.append(cycle)
-        # print(cycles_to_fail)
-        len(cycles_to_fail)
-        len(df)
-        len(y_failure)            
-        df['cycles_to_fail'] = cycles_to_fail
-        df['y_failure'] = y_failure
+# def transform_dataframes_add_ys(data_list= [ ] , *args ):
+# # dataf = df1
+#     for df in data_list:
+#         max_cycles = []
+#         y_failure = []
+#         for num in range(1, max(df['unit']) + 1):
+#             #print(num)
+#             max_cycles.append(max(df['time_cycles'][df['unit']==num] ) )
+#             # max_cycles
+#         cycles_to_fail = []
+#         for total in max_cycles:
+#             for cycle in range(total, 0, -1):
+#                 y_failure.append( 1-(cycle/total) )
+#                 cycles_to_fail.append(cycle)
+#         # print(cycles_to_fail)
+#         len(cycles_to_fail)
+#         len(df)
+#         len(y_failure)            
+#         df['cycles_to_fail'] = cycles_to_fail
+#         df['y_failure'] = y_failure
 
 # df1.cycles_to_fail
 
-###   Transform all four dataframes   #######
 
+
+###   Transform all four dataframes   #######
 transform_dataframes_add_ys(data_frames_to_transform)
 ############################
 
@@ -124,9 +141,10 @@ col = ['unit', 'time_cycles', 'op_set_1', 'op_set_2', 'op_set_3', 't2_Inlet',
 
 
 ## this will plot all columns to check for variation within the feature data
-for name in col:
-    df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
-    plt.show()
+if make_plots==True:
+    for name in col:
+        df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
+        plt.show()
 #
 
 ######     Several features appear to not be predictive  ######
@@ -139,14 +157,14 @@ small_features_list = ['time_cycles', 't24_lpc', 't30_hpc', 't50_lpt',
 
 
 #####     Scatter matrix using time cycles            ##### 
+if make_plots==True:
+    scatter_matrix = pd.scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
 
-scatter_matrix = pd.scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
-
-for ax in scatter_matrix.ravel():
-    ax.set_xlabel(ax.get_xlabel(), fontsize = 6, rotation = 90)
-    ax.set_ylabel(ax.get_ylabel(), fontsize = 6, rotation = 0)
-
-plt.show()
+if make_plots==True:
+    for ax in scatter_matrix.ravel():
+        ax.set_xlabel(ax.get_xlabel(), fontsize = 6, rotation = 90)
+        ax.set_ylabel(ax.get_ylabel(), fontsize = 6, rotation = 0)
+        plt.show()
 
 
 
@@ -156,13 +174,17 @@ small_features_list = ['cycles_to_fail' , 't24_lpc', 't30_hpc', 't50_lpt',
     'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 
     'htbleed_enthalpy', 'w31_hpt_cool_bl', 'w32_lpt_cool_bl' ]
 
+if make_plots==True:
+    scatter_matrix = pd.scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
 
-scatter_matrix = pd.scatter_matrix(df1[small_features_list], alpha=0.2, figsize=(20, 20), diagonal='kde')
 
-for ax in scatter_matrix.ravel():
-    ax.set_xlabel(ax.get_xlabel(), fontsize = 6, rotation = 90)
-    ax.set_ylabel(ax.get_ylabel(), fontsize = 6, rotation = 0)
-plt.show()
+
+
+if make_plots==True:
+    for ax in scatter_matrix.ravel():
+            ax.set_xlabel(ax.get_xlabel(), fontsize = 6, rotation = 90)
+            ax.set_ylabel(ax.get_ylabel(), fontsize = 6, rotation = 0)
+    plt.show()
 
 
 #####                                                       ##### 
@@ -206,14 +228,15 @@ train_features = ['time_cycles', 't24_lpc', 't30_hpc', 't50_lpt',
 
 
 ####  The time cycles column may be used as an alternate y value to train to
-y_cycles_to_fail =  df1.cycles_to_fail
+# y_cycles_to_fail =  df1.cycles_to_fail
 # y_time_cycles = df1.time_cycles
 ####                                                                  #### 
 
 ##   view plots for the features that are to be used in df1   ######
-for name in train_features:
-    df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
-    plt.show()
+if make_plots==True:
+    for name in train_features:
+        df1.plot.scatter( 'cycles_to_fail', name, alpha = .3)
+        plt.show()
 
 
 
@@ -294,8 +317,10 @@ test_eng_max_cycles
 ### Show the max number of cycles for each unit in all of the sets. ######### 
 
 all_eng_max_cycles = []
+
 for e in range(1, max(df1.unit)+1):
     all_eng_max_cycles.append(max(df1['time_cycles'][df1['unit']==e]))
+
 all_eng_max_cycles
 
 
@@ -406,29 +431,29 @@ X_test_feaures = df_new_test[train_features]
 
 
 ###### plot the full range of each engine against the cycles to fail
-fig, axs = plt.subplots(3, 5, figsize=(14, 8))
-univariate_plot_names = df1[train_features]                                     #columns[:-1]
-
-for name, ax in zip(univariate_plot_names, axs.flatten()):
-    plot_univariate_smooth(ax,
-                           df1['cycles_to_fail'],
-                           df1[name].values.reshape(-1, 1),
-                           bootstrap=100)
-    ax.set_title(name, fontsize=7)
-
-plt.show()
+if make_plots==True:
+    fig, axs = plt.subplots(3, 5, figsize=(14, 8))
+    univariate_plot_names = df1[train_features]                                     #columns[:-1]
+    for name, ax in zip(univariate_plot_names, axs.flatten()):
+        plot_univariate_smooth(ax,
+                            df1['cycles_to_fail'],
+                            df1[name].values.reshape(-1, 1),
+                            bootstrap=100)
+        ax.set_title(name, fontsize=7)
+    plt.show()
 
 
 
 #### Plot each feature individually. 
 ###    (ax, df, y, var_name,
-for col in train_features:
-    fig, ax = plt.subplots(figsize=(12, 3))
-    plot_one_univariate(ax, df1, 'cycles_to_fail', col )
-    ax.set_title("Evaluation of: " + str(col))
-    plt.xlabel(col)
-    plt.ylabel( 'Cycles to Fail')
-    plt.show()
+if make_plots==True:
+    for col in train_features:
+        fig, ax = plt.subplots(figsize=(12, 3))
+        plot_one_univariate(ax, df1, 'cycles_to_fail', col )
+        ax.set_title("Evaluation of: " + str(col))
+        plt.xlabel(col)
+        plt.ylabel( 'Cycles to Fail')
+        plt.show()
 
 #### Begining of the linear spline transformation parameters    #######
 # linear_spline_transformer = LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300])
@@ -441,36 +466,17 @@ for col in train_features:
 
 train_features
 
-train_features = 
-['time_cycles', 
-'t24_lpc', 
-'t30_hpc', 
-'t50_lpt', 
-'p30_hpc', 
-'nf_fan_speed', 
-'nc_core_speed', 
-'ps_30_sta_press', 
-'phi_fp_ps30', 
-'nrf_cor_fan_sp', 
-'nrc_core_sp', 
-'bpr_bypass_rat', 
-'htbleed_enthalpy', 
-'w31_hpt_cool_bl', 
-'w32_lpt_cool_bl']
 
 
 cycle_fit = Pipeline([
     ('time_cycles', ColumnSelector(name='time_cycles')),
-    ('time_cycles_spline', LinearSpline(knots=[25, 50, 75, 120, 175 , 220, 240, 260, 280, 300, 320]))
+    ('time_cycles_spline', LinearSpline(knots=[25, 50, 75, 120, 175 , 220, 240, 260, 280, 300, 320, 370]))
 ])
-
 
 t24_fit = Pipeline([
     ('t24_lpc', ColumnSelector(name='t24_lpc')),
     ('t24_lpc_spline', LinearSpline(knots=[641.5, 642,  642.5, 643.0 , 643.4, 644, 644.5]))
 ])
-
-
 
 t30_fit = Pipeline([
     ('t30_hpc', ColumnSelector(name='t30_hpc')),
@@ -482,18 +488,15 @@ t50_fit = Pipeline([
     ('t50_lpt_spline', LinearSpline(knots=[1385, 1390, 1400, 1401, 1411, 1415, 1421, 1430, 1440]))
 ])
 
-
 p30_fit = Pipeline([
     ('p30_hpc', ColumnSelector(name='p30_hpc')),
     ('p30_hpc_spline', LinearSpline(knots=[550, 552.2, 553.2, 554.8, 555, 555.5]))
 ])
 
-
 nf_fan_fit = Pipeline([
     ('nf_fan_speed', ColumnSelector(name='nf_fan_speed')),
     ('nf_fan_speed_spline', LinearSpline(knots=[2387.9, 2388, 2388.1, 2388.15, 2388.2, 2388.3, 2388.4]))
 ])
-
 
 nc_core_fit = Pipeline([
     ('nc_core_speed', ColumnSelector(name='nc_core_speed')),
@@ -505,12 +508,10 @@ ps_30_fit = Pipeline([
     ('ps_30_sta_press_spline', LinearSpline(knots=[47, 47.2, 47.3, 47.45, 47.6, 47.8, 47.9, 48.25]))
 ])
 
-
 phi_fp_fit = Pipeline([
     ('phi_fp_ps30', ColumnSelector(name='phi_fp_ps30')),
     ('phi_fp_ps30_spline', LinearSpline(knots=[519, 520, 520.4 , 521.2, 522, 522.4, 523]))
 ])
-
 
 nrf_cor_fit = Pipeline([
     ('nrf_cor_fan_sp', ColumnSelector(name='nrf_cor_fan_sp')),
@@ -576,10 +577,11 @@ feature_pipeline.fit(df1)
 features_f = feature_pipeline.transform(df1)
 
 #########################################################
-#### Must use the 80 engine traing set !!!!!!!   
 
-feature_pipeline.fit(df_new_train)
-features = feature_pipeline.transform(df_new_train)
+  #### Must use the 80 engine traing set !!!!!!!   
+if df_new_train==True:
+    feature_pipeline.fit(df_new_train)
+    features = feature_pipeline.transform(df_new_train)
 
 ####################################################
 
@@ -587,19 +589,19 @@ features = feature_pipeline.transform(df_new_train)
 
 
 
-#### Build out the new dataframes with each knot   
-#### Must use the 20 engine test set !!!!!!!   
+# #### Build out the new dataframes with each knot   
+# #### Must use the 20 engine test set !!!!!!!   
+if df_new_train==False:
+    feature_pipeline.fit(df_new_test)
+    features = feature_pipeline.transform(df_new_test)
 
-feature_pipeline.fit(df_new_test)
-features = feature_pipeline.transform(df_new_test)
-
-##################################################
+# ##################################################
 
 
 
 ###    Fit model to the pipeline   #######
 model = LinearRegression(fit_intercept=True)
-model.fit(X_features.values, np.log(ytrain)) # <---- note: the np.log transformation
+model.fit(features.values, np.log(ytrain)) # <---- note: the np.log transformation
 
 len(ytest)
 len(X_test_features)
@@ -612,20 +614,21 @@ len(X_test_features)
 
 
 ####  Make predictions against the training set
-y_hat = model.predict(X_features.values)
+y_hat = model.predict(features.values)
 y_hat = np.exp(y_hat)                ## <----- note: the exp to transform back
 
 
 ####  Plot predictions from data against the actual values ########
-x = list(range( 1,360))
-y = x
-plt.scatter(y_hat, ytrain, alpha = 0.1, color='blue')
-plt.plot(x, y, '-r', label='y=2x+1')
-plt.title('Pipline Predictions with log(y)')
-plt.xlabel('y hat from training set')
-plt.ylabel( 'y actuals from training set')
-plt.xlim(360,1)
-plt.show()
+if make_plots==True:
+    x = list(range( 1,360))
+    y = x
+    plt.scatter(y_hat, ytrain, alpha = 0.1, color='blue')
+    plt.plot(x, y, '-r', label='y=2x+1')
+    plt.title('Pipline Predictions with log(y)')
+    plt.xlabel('$\hat {y}$ from training set')
+    plt.ylabel( 'y actuals from training set')
+    plt.xlim(360,1)
+    plt.show()
 ###
 
 
@@ -633,14 +636,14 @@ plt.show()
 
 
 #### Second plot that will show the difference from actuals vs pred for the pipeline model   ###### 
-
-fig, ax = plt.subplots(figsize=(15,15) )
-ax.plot(list(range(1, len(y_hat) + 1)) , y_hat, '.r', label='predicted')
-ax.plot(list(range(1, len(ytrain) + 1 )) , ytrain, '.b' , label='actual')
-plt.xlabel('Index of Value')
-plt.ylabel( 'Cycles to Fail')
-ax.legend()
-plt.show()
+if make_plots==True:
+    fig, ax = plt.subplots(figsize=(15,15) )
+    ax.plot(list(range(1, len(y_hat) + 1)) , y_hat, '.r', label='predicted')
+    ax.plot(list(range(1, len(ytrain) + 1 )) , ytrain, '.b' , label='actual')
+    plt.xlabel('Index of Value')
+    plt.ylabel( 'Cycles to Fail')
+    ax.legend()
+    plt.show()
 
 ##########################################
 
@@ -654,74 +657,69 @@ plt.show()
     # ax.set_title('Plot number {}'.format(i))
 
 
-##### this is the plot of all 80 engines on a single chart
+##### this is the plot of all 80 engines on a single chart  #####
+#####        Training Set Data Plots        ######### 
 
-fig, axs = plt.subplots(8,10, figsize=(10,4))
-ax.set_title("Spline Model of 80 Training Engines")
-start_idx = 0
-for idx, ax in enumerate(axs.flatten()):
-# for idx, e in enumerate(train_engines):
-    end_idx = start_idx + train_eng_max_cycles[idx]
-    print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
-    # fig, ax = plt.subplots(figsize=(15,15) )
-    ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
-    ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '-b' , label='actual')
-    ax.set_title("Engine # " + str(train_engines[idx]), size=6)
-    # plt.tick_params(axis='both', which='major', labelsize=8)
-    # plt.tick_params(axis='both', which='minor', labelsize=6)
-    # plt.xticks(fontsize=8)      #, rotation=90)
-    # plt.title('Engine #: ' + str(train_engines[idx]))
-    # plt.xlabel('Index')
-    # plt.ylabel( 'Cycles to Fail')
-    # ax.legend()
-    ax.xaxis.set_tick_params(labelsize=5)
-    ax.yaxis.set_tick_params(labelsize=5)
-    ax.set_ylim([0,350])
-    ax.set_xlim([350, 0])
-    start_idx = end_idx 
-        # plt.show()
-
-
-# plt.tight_layout()
-plt.show()
+if make_plots==True and training_set==True:
+    fig, axs = plt.subplots(8,10, figsize=(10,4))
+    ax.set_title("Spline Model of 80 Training Engines")
+    start_idx = 0
+    for idx, ax in enumerate(axs.flatten()):
+    # for idx, e in enumerate(train_engines):
+        end_idx = start_idx + train_eng_max_cycles[idx]
+        print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
+        # fig, ax = plt.subplots(figsize=(15,15) )
+        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
+        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '-b' , label='actual')
+        ax.set_title("Engine # " + str(train_engines[idx]), size=6)
+        # plt.tick_params(axis='both', which='major', labelsize=8)
+        # plt.tick_params(axis='both', which='minor', labelsize=6)
+        # plt.xticks(fontsize=8)      #, rotation=90)
+        # plt.title('Engine #: ' + str(train_engines[idx]))
+        # plt.xlabel('Index')
+        # plt.ylabel( 'Cycles to Fail')
+        # ax.legend()
+        ax.xaxis.set_tick_params(labelsize=5)
+        ax.yaxis.set_tick_params(labelsize=5)
+        ax.set_ylim([0,350])
+        ax.set_xlim([350, 0])
+        start_idx = end_idx 
+    plt.show()
 
 
 
-################################
+              ################################
 
 ##### Test Set of data    ###############################
 ##### this is the plot of all 20 test engines on a single chart
 
-fig, axs = plt.subplots(4, 5 , figsize=(10,4))
-ax.set_title("Spline Model of 20 Test Engines")
-start_idx = 0
-for idx, ax in enumerate(axs.flatten()):
-# for idx, e in enumerate(train_engines):
-    end_idx = start_idx + test_eng_max_cycles[idx]
-    print(start_idx, end_idx, test_eng_max_cycles[idx], end_idx-start_idx)
-    # fig, ax = plt.subplots(figsize=(15,15) )
-    # ax.plot(y_hat[start_idx : end_idx], list(range(train_eng_max_cycles[idx], 0, -1)), '.r', label='predicted')
-    # ax.plot(ytrain[start_idx : end_idx] , list(range(train_eng_max_cycles[idx], 0, -1)) , '-b' , label='actual')
-    ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
-    ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , ytest[start_idx : end_idx] , '-b' , label='actual')
-    ax.set_title("Engine # " + str(test_engines[idx]), size=6)
-    # plt.tick_params(axis='both', which='major', labelsize=8)
-    # plt.tick_params(axis='both', which='minor', labelsize=6)
-    # plt.xticks(fontsize=8)      #, rotation=90)
-    # plt.title('Engine #: ' + str(train_engines[idx]))
-    # plt.xlabel('Index')
-    # plt.ylabel( 'Cycles to Fail')
-    # ax.legend()
-    ax.set_ylim( 0  , 350 )
-    ax.set_xlim(350 ,  0)
-    ax.xaxis.set_tick_params(labelsize=5)
-    ax.yaxis.set_tick_params(labelsize=5)
-    start_idx = end_idx 
-        # plt.show()
-
-
-# plt.tight_layout()
-plt.show()
+if make_plots==True and training_set==False:
+    fig, axs = plt.subplots(4, 5 , figsize=(10,4))
+    ax.set_title("Spline Model of 20 Test Engines")
+    start_idx = 0
+    for idx, ax in enumerate(axs.flatten()):
+    # for idx, e in enumerate(train_engines):
+        end_idx = start_idx + test_eng_max_cycles[idx]
+        print(start_idx, end_idx, test_eng_max_cycles[idx], end_idx-start_idx)
+        # fig, ax = plt.subplots(figsize=(15,15) )
+        # ax.plot(y_hat[start_idx : end_idx], list(range(train_eng_max_cycles[idx], 0, -1)), '.r', label='predicted')
+        # ax.plot(ytrain[start_idx : end_idx] , list(range(train_eng_max_cycles[idx], 0, -1)) , '-b' , label='actual')
+        ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
+        ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , ytest[start_idx : end_idx] , '-b' , label='actual')
+        ax.set_title("Engine # " + str(test_engines[idx]), size=6)
+        # plt.tick_params(axis='both', which='major', labelsize=8)
+        # plt.tick_params(axis='both', which='minor', labelsize=6)
+        # plt.xticks(fontsize=8)      #, rotation=90)
+        # plt.title('Engine #: ' + str(train_engines[idx]))
+        # plt.xlabel('Index')
+        # plt.ylabel( 'Cycles to Fail')
+        # ax.legend()
+        ax.set_ylim( 0  , 350 )
+        ax.set_xlim(350 ,  0)
+        ax.xaxis.set_tick_params(labelsize=5)
+        ax.yaxis.set_tick_params(labelsize=5)
+        start_idx = end_idx 
+    plt.show()
 
 
 
@@ -736,46 +734,60 @@ np.mean(train_eng_max_cycles)
 
 #### Third plot that will show the difference from actuals vs pred for
 # #   the pipeline model for each engine one by one  ###### 
-start_idx = 0
-for idx, e in enumerate(train_engines):
-    end_idx = start_idx + train_eng_max_cycles[idx]
-    print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
-    fig, ax = plt.subplots(figsize=(15,15) )
-    ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
-    ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '.b' , label='actual')
-    plt.title('Engine #: ' + str(e))
-    plt.xlabel('Cycles to Fail')
-    plt.ylabel( 'Cycles Used')
-    plt.axvline(stats.describe(train_eng_max_cycles)[1][0], color='r', label='min' )
-    plt.axvline(stats.describe(train_eng_max_cycles)[2], color='g' , label='avg' )
-    plt.axvline(stats.describe(train_eng_max_cycles)[1][1], color='b' , label='max' )
-    
-    ax.legend()
-    start_idx = end_idx 
-    plt.show()
+if make_plots==True and training_set==True:
+    start_idx = 0
+    for idx, e in enumerate(train_engines):
+        end_idx = start_idx + train_eng_max_cycles[idx]
+        print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
+        fig, ax = plt.subplots(figsize=(15,15) )
+        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
+        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '.b' , label='actual')
+        plt.title('Engine #: ' + str(e))
+        plt.xlabel('Cycles to Fail')
+        plt.ylabel( 'Cycles Used')
+        plt.axvline(stats.describe(train_eng_max_cycles)[1][0], color='r', label='min' )
+        plt.axvline(stats.describe(train_eng_max_cycles)[2], color='g' , label='avg' )
+        plt.axvline(stats.describe(train_eng_max_cycles)[1][1], color='b' , label='max' )
+        
+        ax.legend()
+        start_idx = end_idx 
+        plt.show()
+
+
+# #   the pipeline model for each engine one by one  ###### 
+if make_plots==True and training_set==False:
+    start_idx = 0
+    for idx, e in enumerate(train_engines):
+        end_idx = start_idx + train_eng_max_cycles[idx]
+        print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
+        fig, ax = plt.subplots(figsize=(15,15) )
+        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
+        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '.b' , label='actual')
+        plt.title('Engine #: ' + str(e))
+        plt.xlabel('Cycles to Fail')
+        plt.ylabel( 'Cycles Used')
+        plt.axvline(stats.describe(train_eng_max_cycles)[1][0], color='r', label='min' )
+        plt.axvline(stats.describe(train_eng_max_cycles)[2], color='g' , label='avg' )
+        plt.axvline(stats.describe(train_eng_max_cycles)[1][1], color='b' , label='max' )
+        
+        ax.legend()
+        start_idx = end_idx 
+        plt.show()
 
 
 
 
-
-
-### This will function will create the actual estimations vs predicted values
-def plot_many_predicteds_vs_actuals(var_names, y_hat, n_bins=50):
-    fig, axs = plt.subplots(len(var_names), figsize=(12, 3*len(var_names)))
-    for ax, name in zip(axs, var_names):
-        x = df_new_train[name]
-        predicteds_vs_actuals(ax, x, df_new_train["cycles_to_fail"], y_hat, n_bins=n_bins)
-        # ax.set_title("{} Predicteds vs. Actuals".format(name))
-    return fig, axs
 
 
 
 ### This will plot the final estimations vs the actual data
 train_features
 # y_hat = model.predict(features.values)
-fig, axs = plot_many_predicteds_vs_actuals(train_features, y_hat)
-# fig.tight_layout()df1
-plt.show()
+
+if make_plots==True and training_set==True:
+    fig, axs = plot_many_predicteds_vs_actuals(train_features, y_hat)
+    # fig.tight_layout()df1
+    plt.show()
 
 
 
