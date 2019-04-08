@@ -40,7 +40,7 @@ def transform_dataframes_add_ys(data_list= [ ] , *args ):
         c_max = stats.describe(df_eng_max_cycles)[1][1]
         lower_third = ((c_max - c_min) / 3) + c_min
         middle_third = (( 2* (c_max - c_min) / 3 ) + c_min)
-        print(c_min, c_mean , c_max, lower_third, middle_third)
+        # print(c_min, c_mean , c_max, lower_third, middle_third)
         above_mean_life = []
         for cycles in df_eng_max_cycles:
             # print(cycles)
