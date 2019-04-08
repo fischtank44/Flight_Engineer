@@ -170,14 +170,32 @@ if make_plots==True:
 #   print (df[c].describe()[2] ) 
 
 
-# ### This will remove features based the standard deviation for each column
-# train_features = []
-# limit = .01
-# col = df.columns
-# for c in col:
-#   if (df[c].describe()[2] ) >= .01:
-#       train_features.append(c)
-# train_features
+### This will remove features based the standard deviation for each column
+train_features = []
+limit = .01
+col = df.columns
+for c in col:
+  if (df[c].describe()[2] ) >= .01:
+      train_features.append(c)
+
+train_features
+train_features = [ 
+        'time_cycles', 
+        't24_lpc', 
+        't30_hpc', 
+        't50_lpt', 
+        'p30_hpc', 
+        'nf_fan_speed', 
+        'nc_core_speed', 
+        'ps_30_sta_press', 
+        'phi_fp_ps30', 
+        'nrf_cor_fan_sp', 
+        'nrc_core_sp', 
+        'bpr_bypass_rat', 
+        'htbleed_enthalpy', 
+        'w31_hpt_cool_bl', 
+        'w32_lpt_cool_bl' 
+]
 
 
 
@@ -433,11 +451,11 @@ feature_pipeline = FeatureUnion([
     ('p30_hpc', p30_fit),
     ('t50_lpt', t50_fit),
     ('nf_fan_speed', nf_fan_fit),
-    ('nc_core_speed', nc_core_fit),
+    # ('nc_core_speed', nc_core_fit),
     ('ps_30_sta_press', ps_30_fit),
     ('phi_fp_ps30', phi_fp_fit),
     ('nrf_cor_fan_sp', nrf_cor_fit),
-    ('nrc_core_sp', nrc_core_fit),
+    # ('nrc_core_sp', nrc_core_fit),
     ("bpr_bypass_rat", bpr_bypass_fit),
     ("htbleed_enthalpy", htbleed_fit),
     ("w31_hpt_cool_bl", w31_fit),
@@ -460,7 +478,7 @@ feature_pipeline = FeatureUnion([
 
 
   #### Must use the 80 engine traing set !!!!!!!   
-if df_new_train==True:
+if training_set == True:
     feature_pipeline.fit(df_new_train)
     features = feature_pipeline.transform(df_new_train)
 
@@ -469,7 +487,7 @@ if df_new_train==True:
   
 # #### Build out the new dataframes with each knot   
 # #### Must use the 20 engine test set !!!!!!!   
-if df_new_train==False:
+if training_set == False:
     feature_pipeline.fit(df_new_test)
     features = feature_pipeline.transform(df_new_test)
 
@@ -477,20 +495,35 @@ if df_new_train==False:
 
 
 
-###    Fit model to the pipeline   #######
-model = LinearRegression(fit_intercept=True)
-model.fit(features.values, np.log(ytrain)) # <---- note: the np.log transformation
-
-len(ytest)
-len(ytrain)
-len(X_test_features)
-len(X_train_features)
-
-
-
+###    Fit train model to the pipeline   #######
+if training_set == True:
+    model = LinearRegression(fit_intercept=True)
+    model.fit(features.values, np.log(ytrain)) # <---- note: the np.log transformation
 ####  Make predictions against the training set
-y_hat = model.predict(features.values)
-y_hat = np.exp(y_hat)                ## <----- note: the exp to transform back
+    y_hat = model.predict(features.values)
+    y_hat = np.exp(y_hat)                ## <----- note: the exp to transform back
+len(y_hat)
+len(ytrain)
+len(features)
+
+
+
+
+
+###    Fit test model to the pipeline   #######
+if training_set == False:
+    model = LinearRegression(fit_intercept=True)
+    model.fit(features.values, np.log(ytest)) # <---- note: the np.log transformation
+####  Make predictions against the test set
+    y_hat = model.predict(features.values)
+    y_hat = np.exp(y_hat)                ## <----- note: the exp to transform back
+
+len(y_hat)
+len(ytest)
+len(features)
+
+
+
 
 
 ####  Plot predictions from data against the actual values ########
@@ -649,7 +682,7 @@ if make_plots==True and training_set==False:
 ### This will plot the final estimations vs the actual data
 
 
-y_hat = model.predict(df_new_train.values )
+# y_hat = model.predict(df_new_train.values )
 
 
 
@@ -659,9 +692,12 @@ if make_plots==True and training_set==True:
     # fig.tight_layout()df
     plt.show()
 
-fig, axs = plot_many_predicteds_vs_actuals(train_features, y_hat)
+if make_plots==True and training_set==False:
+    fig, axs = plot_many_predicteds_vs_actuals(train_features, y_hat)
     # fig.tight_layout()df
-plt.show()
+    plt.show()
+
+
 len(y_hat)
 len(train_features)
 train_features
@@ -703,19 +739,25 @@ r2_for_last_n_cycles(y_hat , ytrain, last_n=5)
 
 ###################   Make a list of r squared values for plotting   ##########
 
-r2_values = r2_generator_last_n_cycles(y_hat , ytrain, 200)
+if training_set == True:
+    r2_values = r2_generator_last_n_cycles(y_hat , ytrain, 200)
+
+
+if training_set == False:
+    r2_values = r2_generator_last_n_cycles(y_hat , ytest, 200)
 
 ########  Plot the r2 values as the number of cycles remaining approaches the end #######
 
 ##### plot the full against the cycles to fail
-fig, ax = plt.subplots(1, 1, figsize=(13, 13))
-ax.scatter(range(len(r2_values)+1, 1, -1) , r2_values)
-plt.ylim(-2, 1)
-plt.xlim(len(r2_values), 0)
-plt.title('R Squared')
-plt.xlabel('Cycles to Fail')
-plt.ylabel( 'R Squared Value')
-plt.show()
+if make_plots == True:
+    fig, ax = plt.subplots(1, 1, figsize=(13, 13))
+    ax.scatter(range(len(r2_values)+1, 1, -1) , r2_values)
+    plt.ylim(-2, 1)
+    plt.xlim(len(r2_values), 0)
+    plt.title('R Squared')
+    plt.xlabel('Cycles to Fail')
+    plt.ylabel( 'R Squared Value')
+    plt.show()
 
 ### Plot of r-squared as the number of observations approaches 1  #########
 
@@ -727,6 +769,8 @@ plt.show()
 
 ####################################################
 ####   Test for full transformation of data frame  ##########
+
+
 
 
 
@@ -749,11 +793,11 @@ cols_to_use = [
     't50_lpt', 
     'p30_hpc', 
     'nf_fan_speed', 
-    'nc_core_speed', 
+    # 'nc_core_speed', 
     'ps_30_sta_press', 
     'phi_fp_ps30', 
     'nrf_cor_fan_sp', 
-    'nrc_core_sp', 
+    # 'nrc_core_sp', 
     'bpr_bypass_rat', 
     'htbleed_enthalpy', 
     'w31_hpt_cool_bl', 
@@ -785,6 +829,8 @@ fig, axs = plot_partial_dependences(
      y=None#np.log(df[target_variable]).values  
      )
 # fig.tight_layout()
+
+
 plt.show()
 
 
