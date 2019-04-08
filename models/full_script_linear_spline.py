@@ -95,13 +95,14 @@ small_features_list = [
 
 #######      List of vaiables and features for model    #######
 
+
 training_set = True
 make_plots = False
 data_frames_to_transform = [df1, df2, df3 , df4]
 transform_dataframes_add_ys(data_frames_to_transform)
 cols_to_use = small_features_list
 df = df1          #<----- #This is the dataframe to use for the model
-
+target_variable = 'cycles_to_fail'  #   or 'y_failure'
 
 ##########################################################
 # It will be a countdown of the total cycles for training set  ######
@@ -109,37 +110,7 @@ df = df1          #<----- #This is the dataframe to use for the model
 #### add column to the end for logistic predictive model   ######
 #### 
 
-# data_frames_to_transform = [df1, df2, df3 , df4]
-
-# def transform_dataframes_add_ys(data_list= [ ] , *args ):
-# # dataf = df1
-#     for df in data_list:
-#         max_cycles = []
-#         y_failure = []
-#         for num in range(1, max(df['unit']) + 1):
-#             #print(num)
-#             max_cycles.append(max(df['time_cycles'][df['unit']==num] ) )
-#             # max_cycles
-#         cycles_to_fail = []
-#         for total in max_cycles:
-#             for cycle in range(total, 0, -1):
-#                 y_failure.append( 1-(cycle/total) )
-#                 cycles_to_fail.append(cycle)
-#         # print(cycles_to_fail)
-#         len(cycles_to_fail)
-#         len(df)
-#         len(y_failure)            
-#         df['cycles_to_fail'] = cycles_to_fail
-#         df['y_failure'] = y_failure
-
 # df1.cycles_to_fail
-
-
-
-###   Transform all four dataframes   #######
-
-############################
-
 
 
 #####  End of data import file #######
@@ -150,7 +121,7 @@ df = df1          #<----- #This is the dataframe to use for the model
 ## this will plot all columns to check for variation within the feature data
 if make_plots==True:
     for name in col:
-        df.plot.scatter( 'cycles_to_fail', name, alpha = .3)
+        df.plot.scatter( target_variable, name, alpha = .3)
         plt.show()
 #
 
@@ -186,27 +157,27 @@ if make_plots==True:
 #####                                                       ##### 
 
 
-#    view the description of each column 
-col = df.columns
-# col = train_features
-for c in col:
-  print (df[c].describe() ) 
+# #    view the description of each column 
+# col = df.columns
+# # col = train_features
+# for c in col:
+#   print (df[c].describe() ) 
 
 
-### This will print only the standard deviation for each column
-col = df.columns
-for c in col:
-  print (df[c].describe()[2] ) 
+# ### This will print only the standard deviation for each column
+# col = df.columns
+# for c in col:
+#   print (df[c].describe()[2] ) 
 
 
-### This will remove features based the standard deviation for each column
-train_features = []
-limit = .01
-col = df.columns
-for c in col:
-  if (df[c].describe()[2] ) >= .01:
-      train_features.append(c)
-train_features
+# ### This will remove features based the standard deviation for each column
+# train_features = []
+# limit = .01
+# col = df.columns
+# for c in col:
+#   if (df[c].describe()[2] ) >= .01:
+#       train_features.append(c)
+# train_features
 
 
 
@@ -217,29 +188,30 @@ train_features
 ##   view plots for the features that are to be used in df   ######
 if make_plots==True:
     for name in train_features:
-        df.plot.scatter( 'cycles_to_fail', name, alpha = .3)
+        df.plot.scatter( target_variable, name, alpha = .3)
         plt.show()
 
-#### remove features that do not change at all for this dataset
-for c in df.columns:
-    df[c].describe()
 
 #####   adjust the data frame to choose 20 % of the engines by unmber and 
 #####   train to a sample of 80% by number and 20% saved for test data.
-# engines = list(np.random.choice(range(1,101), 20, replace= False))
+# test_engines = list(np.random.choice(range(1,101), 20, replace= False))
 test_engines = [4, 18, 19, 21, 28, 33, 42, 45, 46, 50, 61, 73, 74, 78, 82, 83, 84, 86, 92, 94]
-
-train_engines = []
-for num in range(1,101):
-    if num not in test_engines:
-        train_engines.append(num)
-#        #
 
 
 train_engines = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 22, 23, 24, 25, 26, 
     27, 29, 30, 31, 32, 34, 35, 36, 37, 38, 39, 40, 41, 43, 44, 47, 48, 49, 51, 52, 53, 54, 55, 
     56, 57, 58, 59, 60, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 75, 76, 77, 79, 80, 81, 85, 
     87, 88, 89, 90, 91, 93, 95, 96, 97, 98, 99, 100]
+
+
+
+# train_engines = []
+# for num in range(1,101):
+#     if num not in test_engines:
+#         train_engines.append(num)
+# #        #
+
+
 
 train_engines
 test_engines
@@ -256,6 +228,9 @@ test_list = list(test_idx)
 train_list = list(train_idx)
 
 
+
+
+
 #### Create new data frames using seperate test and training engines   ##########
 df_new_test = df.iloc[test_list].copy()
 df_new_train = df.iloc[train_list].copy()
@@ -269,6 +244,7 @@ df_new_train.shape
 train_eng_max_cycles = []
 for e in train_engines:
     train_eng_max_cycles.append(max(df['time_cycles'][df['unit']==e]))
+
 
 train_eng_max_cycles
 stats.describe(train_eng_max_cycles)
@@ -290,14 +266,15 @@ stats.describe(test_eng_max_cycles)
 # skewness=0.8514362921848939, kurtosis=-0.005870492535239968)
 
 
-### Show the max number of cycles for each unit in all of the sets. ######### 
 
-all_eng_max_cycles = []
 
-for e in range(1, max(df.unit)+1):
-    all_eng_max_cycles.append(max(df['time_cycles'][df['unit']==e]))
+# ### Show the max number of cycles for each unit in all of the sets. ######### 
+# all_eng_max_cycles = []
 
-all_eng_max_cycles
+# for e in range(1, max(df.unit)+1):
+#     all_eng_max_cycles.append(max(df['time_cycles'][df['unit']==e]))
+
+# all_eng_max_cycles
 
 
 ###########             Train to Cycles to Fail                ######################
@@ -305,9 +282,9 @@ all_eng_max_cycles
 
 
 ## This will make the train test split for this model ####
-ytrain = df_new_train['cycles_to_fail']
+ytrain = df_new_train[target_variable]
 X_train_features = df_new_train[train_features]
-ytest = df_new_test['cycles_to_fail']
+ytest = df_new_test[target_variable]
 X_test_feaures = df_new_test[train_features]
 
 
@@ -349,7 +326,7 @@ if make_plots==True:
     univariate_plot_names = df[train_features]                                     #columns[:-1]
     for name, ax in zip(univariate_plot_names, axs.flatten()):
         plot_univariate_smooth(ax,
-                            df['cycles_to_fail'],
+                            df[target_variable],
                             df[name].values.reshape(-1, 1),
                             bootstrap=100)
         ax.set_title(name, fontsize=7)
@@ -362,7 +339,7 @@ if make_plots==True:
 if make_plots==True:
     for col in train_features:
         fig, ax = plt.subplots(figsize=(12, 3))
-        plot_one_univariate(ax, df, 'cycles_to_fail', col )
+        plot_one_univariate(ax, df, target_variable, col )
         ax.set_title("Evaluation of: " + str(col))
         plt.xlabel(col)
         plt.ylabel( 'Cycles to Fail')
@@ -763,7 +740,7 @@ features_f = feature_pipeline.transform(df_new_train)
 
 
 model = LinearRegression(fit_intercept=True)
-model.fit(features_f.values, np.log(df_new_train['cycles_to_fail'])) 
+model.fit(features_f.values, np.log(df_new_train[target_variable])) 
 
 cols_to_use = [
     'time_cycles', 
@@ -789,7 +766,7 @@ cols_to_use = [
 models = bootstrap_train(
     LinearRegression, 
     features_f.values, 
-    np.log(df_new_train['cycles_to_fail'].values),
+    np.log(df_new_train[target_variable].values),
     bootstraps=500,
     fit_intercept=True
 )
@@ -805,7 +782,7 @@ fig, axs = plot_partial_dependences(
      var_names=cols_to_use,
      pipeline=feature_pipeline,
      bootstrap_models=models,
-     y=None#np.log(df['cycles_to_fail']).values  
+     y=None#np.log(df[target_variable]).values  
      )
 # fig.tight_layout()
 plt.show()

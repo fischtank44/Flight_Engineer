@@ -16,11 +16,11 @@ def transform_dataframes_add_ys(data_list= [ ] , *args ):
         for num in range(1, max(df['unit']) + 1):
             #print(num)
             max_cycles.append(max(df['time_cycles'][df['unit']==num] ) )
-            # max_cycles
+            max_cycles
         cycles_to_fail = []
         for total in max_cycles:
             for cycle in range(total, 0, -1):
-                y_failure.append( 1-(cycle/total) )
+                y_failure.append((cycle/total) )
                 cycles_to_fail.append(cycle)
         # print(cycles_to_fail)
         len(cycles_to_fail)
@@ -28,3 +28,4 @@ def transform_dataframes_add_ys(data_list= [ ] , *args ):
         len(y_failure)            
         df['cycles_to_fail'] = cycles_to_fail
         df['y_failure'] = y_failure
+        df['first_n_short'] = 

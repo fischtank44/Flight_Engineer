@@ -22,3 +22,50 @@
 #
 #
 #
+
+
+
+
+#### Second plot that will show the difference from actuals vs pred
+# fig = plt.figure()
+# fig, ax = plt.subplots(figsize=(15,15) )
+# ax.plot(list(range(1, len(L_y_predicted) + 1)) , L_y_predicted, '.r', label='predicted')
+# ax.plot(list(range(1, len(ytrain) + 1 )) , ytrain, '.b' , label='actual')
+# plt.xlabel('Index of Value')
+# plt.ylabel( 'Cycles to Fail')
+# ax.legend()
+# plt.show()
+
+### First score from basic linear regression model   ####
+# base_score = r2(ytrain, L_y_predicted)
+# base_score
+# linear_model_80_engine = base_score
+# linear_model_80_engine
+
+#####  score of model no tuning trained to time cycles to go
+##  0.5302416225409862
+
+#### score of model with no tuning trained to cycles remaining 
+##  0.5302416225409862
+##
+### There is no difference between the two which makes sense.
+
+####  Linear model 80 engine split 
+# linear_model_80_engine
+# 0.6004573742141459
+
+
+#### Begining of the linear spline transformation parameters    #######
+# linear_spline_transformer = LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300])
+
+# linear_spline_transformer.transform(df1['cycles_to_fail']).head()
+
+# cement_selector = ColumnSelector(name='cycles_to_fail')
+# cement_column = cement_selector.transform('cycles_to_fail')
+# linear_spline_transformer.transform(cement_column).head()
+
+
+
+
+
+
