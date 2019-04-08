@@ -7,8 +7,8 @@ plt.style.use('ggplot')
 def plot_many_predicteds_vs_actuals(var_names, y_hat, n_bins=50):
     fig, axs = plt.subplots(len(var_names), figsize=(12, 3*len(var_names)))
     for ax, name in zip(axs, var_names):
-        x = df_new_train[name]
-        predicteds_vs_actuals(ax, x, df_new_train["cycles_to_fail"], y_hat, n_bins=n_bins)
+        x = df[name]
+        predicteds_vs_actuals(ax, x, df["cycles_to_fail"], y_hat, n_bins=n_bins)
         # ax.set_title("{} Predicteds vs. Actuals".format(name))
     return fig, axs
 

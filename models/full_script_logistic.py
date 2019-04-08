@@ -38,6 +38,7 @@ from math import ceil
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error as mse
 from sklearn.metrics import r2_score as r2
+from sklearn.metrics import log_loss
 from r_squared_funcs import (
     r2_for_last_n_cycles,
     r2_generator_last_n_cycles)
@@ -53,6 +54,13 @@ from r_squared_funcs import (
     r2_generator_last_n_cycles)
 from enginedatatransformer import transform_dataframes_add_ys
 from plot_pred_vs_act import plot_many_predicteds_vs_actuals
+from logistic_plots import (
+    calculate_threshold_values,
+    plot_roc,
+    plot_precision_recall,
+    decision_boundary_x2,
+    plot_decision_boundary
+)
 
 ##################################
 
@@ -100,13 +108,13 @@ small_features_list = [
 
 
 training_set = True
-make_plots = True
+make_plots = False
 data_frames_to_transform = [df1, df2, df3 , df4]
 transform_dataframes_add_ys(data_frames_to_transform)
 cols_to_use = small_features_list
 df = df1          #<----- #This is the dataframe to use for the model
 target_variable = 'above_mean_life'  #   or 'y_failure'
-n = 30   # <---- set the number of initial cycles to check
+n = 75   # <---- set the number of initial cycles to check
                 # for long vs short life. 
 
 ##########################################################
@@ -264,21 +272,6 @@ df_new_train = df.iloc[train_list].copy()
 df_new_test.shape
 df_new_train.shape
 
-#########   Limit the size of the dataframe to first n observations   ##############################
-def first_n_observations (  df , n):
-    num_observations = range(1, n +1 )
-    train_idx = df['time_cycles'].apply(lambda x: x in num_observations)
-    train_list = list(train_idx)
-    return df.iloc[train_list].copy()
-
-
-###### Returns the new data frame with required number of cycles for catagorization   #############
-training_frame_log = first_n_observations(df_new_train,30)
-training_frame_log
-
-df = training_frame_log
-
-##################################################################################################
 
 
 ###### this will make a list of the max number of cycles for the training set of engines
@@ -309,20 +302,6 @@ stats.describe(test_eng_max_cycles)
 
 
 
-
-# ### Show the max number of cycles for each unit in all of the sets. ######### 
-# all_eng_max_cycles = []
-
-# for e in range(1, max(df.unit)+1):
-#     all_eng_max_cycles.append(max(df['time_cycles'][df['unit']==e]))
-
-# all_eng_max_cycles
-
-
-###########             Train to Cycles to Fail                ######################
-###########@@@@@@@@    Toggle commments to change target   @@@@@########################
-
-
 ## This will make the train test split for this model ####
 
 # this is the training set split  #######
@@ -335,6 +314,41 @@ if training_set == True:
 if training_set == False:
     y = df[target_variable]
     feaures = df[train_features]
+
+
+
+
+# ### Show the max number of cycles for each unit in all of the sets. ######### 
+# all_eng_max_cycles = []
+
+# for e in range(1, max(df.unit)+1):
+#     all_eng_max_cycles.append(max(df['time_cycles'][df['unit']==e]))
+
+# all_eng_max_cycles
+
+
+
+#########   Limit the size of the dataframe to first n observations   ##############################
+def first_n_observations (  df , n):
+    num_observations = range(1, n +1 )
+    train_idx = df['time_cycles'].apply(lambda x: x in num_observations)
+    train_list = list(train_idx)
+    return df.iloc[train_list].copy()
+
+
+######################################################################################
+###### Returns the new data frame with required number of cycles for catagorization   #############
+training_frame_log = first_n_observations(df_new_train,n)
+training_frame_log
+
+df = training_frame_log
+
+##################################################################################################
+
+
+
+###########             Train to Cycles above and below the mean               ######################
+###########@@@@@@@@    Toggle commments to change target   @@@@@########################
 
 
 
@@ -395,105 +409,6 @@ if make_plots==True:
         plt.show()
 
 
-train_features
-
-cycle_fit = Pipeline([
-    ('time_cycles', ColumnSelector(name='time_cycles')),
-    ('time_cycles_spline', LinearSpline(knots=[25, 50, 75, 120, 175 , 220, 240, 260, 280, 300]))
-])
-
-t24_fit = Pipeline([
-    ('t24_lpc', ColumnSelector(name='t24_lpc')),
-    ('t24_lpc_spline', LinearSpline(knots=[641.5, 642,  642.5, 643.0 , 643.4, 644]))
-])
-
-t30_fit = Pipeline([
-    ('t30_hpc', ColumnSelector(name='t30_hpc')),
-    ('t30_hpc_spline', LinearSpline(knots=[ 1580, 1584, 1588, 1593, 1598 , 1610]))
-])
-
-t50_fit = Pipeline([
-    ('t50_lpt', ColumnSelector(name='t50_lpt')),
-    ('t50_lpt_spline', LinearSpline(knots=[1385, 1390, 1400, 1401, 1411, 1415, 1421, 1430, 1440]))
-])
-
-p30_fit = Pipeline([
-    ('p30_hpc', ColumnSelector(name='p30_hpc')),
-    ('p30_hpc_spline', LinearSpline(knots=[ 552.2, 553.2, 554.8, 555, 555.5]))
-])
-
-nf_fan_fit = Pipeline([
-    ('nf_fan_speed', ColumnSelector(name='nf_fan_speed')),
-    ('nf_fan_speed_spline', LinearSpline(knots=[2387.9, 2388, 2388.1, 2388.15, 2388.2, 2388.3]))
-])
-
-nc_core_fit = Pipeline([
-    ('nc_core_speed', ColumnSelector(name='nc_core_speed')),
-    ('nc_core_speed_spline', LinearSpline(knots=[ 9040, 9060, 9070, 9080, 9090]))
-])
-
-ps_30_fit = Pipeline([
-    ('ps_30_sta_press', ColumnSelector(name='ps_30_sta_press')),
-    ('ps_30_sta_press_spline', LinearSpline(knots=[47, 47.2, 47.3, 47.45, 47.6, 47.8, 47.9]))
-])
-
-phi_fp_fit = Pipeline([
-    ('phi_fp_ps30', ColumnSelector(name='phi_fp_ps30')),
-    ('phi_fp_ps30_spline', LinearSpline(knots=[ 520, 520.4 , 521.2, 522, 522.4, 523]))
-])
-
-nrf_cor_fit = Pipeline([
-    ('nrf_cor_fan_sp', ColumnSelector(name='nrf_cor_fan_sp')),
-    ('nrf_cor_fan_sp_spline', LinearSpline(knots=[2387.9, 2388, 2388.6, 2388.2 , 2388.3, 2388.4]))
-])
-
-nrc_core_fit = Pipeline([
-    ('nrc_core_sp', ColumnSelector(name='nrc_core_sp')),
-    ('nrc_core_sp_spline', LinearSpline(knots=[8107.4 , 8117, 8127.5 , 8138.7 , 8149.4 , 8160 , 8171 , 8200 , 8250]))
-])
-
-bpr_bypass_fit = Pipeline([
-    ('bpr_bypass_rat', ColumnSelector(name='bpr_bypass_rat')),
-    ('bpr_bypass_rat_spline', LinearSpline(knots=[8.35 , 8.38, 8.41, 8.45, 8.49]))
-])
-
-
-htbleed_fit = Pipeline([
-    ('htbleed_enthalpy', ColumnSelector(name='htbleed_enthalpy')),
-    ('htbleed_enthalpy_spline', LinearSpline(knots=[389, 390, 391, 392, 393, 394,395, 396, 397, 398, 399]))
-])
-
-w31_fit = Pipeline([
-    ('w31_hpt_cool_bl', ColumnSelector(name='w31_hpt_cool_bl')),
-    ('w31_hpt_cool_bl_spline', LinearSpline(knots=[38.5, 38.7, 38.9, 39.1, 39.2]))
-])
-
-w32_fit = Pipeline([
-    ('w32_lpt_cool_bl', ColumnSelector(name='w32_lpt_cool_bl')),
-    ('w32_lpt_cool_bl_spline', LinearSpline(knots=[ 23.14, 23.2,  23.32, 23.44]))
-])
-
-
-
-feature_pipeline = FeatureUnion([
-    ('time_cycles', cycle_fit),
-    ('t24_lpc', t24_fit),
-    ('t30_hpc', t30_fit),
-    ('p30_hpc', p30_fit),
-    ('t50_lpt', t50_fit),
-    ('nf_fan_speed', nf_fan_fit),
-    ('nc_core_speed', nc_core_fit),
-    ('ps_30_sta_press', ps_30_fit),
-    ('phi_fp_ps30', phi_fp_fit),
-    ('nrf_cor_fan_sp', nrf_cor_fit),
-    ('nrc_core_sp', nrc_core_fit),
-    ("bpr_bypass_rat", bpr_bypass_fit),
-    ("htbleed_enthalpy", htbleed_fit),
-    ("w31_hpt_cool_bl", w31_fit),
-    ("w32_lpt_cool_bl", w32_fit)
-])
-
-
 
 
 
@@ -508,53 +423,155 @@ feature_pipeline = FeatureUnion([
 #########################################################
 
 
-  #### Must use the 80 engine traing set !!!!!!!   
-if training_set == True:
-    feature_pipeline.fit(df)
-    features = feature_pipeline.transform(df)
+#   #### Must use the 80 engine traing set !!!!!!!   
+# if training_set == True:
+#     feature_pipeline.fit(df)
+#     features = feature_pipeline.transform(df)
 
-####################################################
+# ####################################################
 
   
-# #### Build out the new dataframes with each knot   
-# #### Must use the 20 engine test set !!!!!!!   
-if training_set == False:
-    feature_pipeline.fit(df)
-    features = feature_pipeline.transform(df)
+# # #### Build out the new dataframes with each knot   
+# # #### Must use the 20 engine test set !!!!!!!   
+# if training_set == False:
+#     feature_pipeline.fit(df)
+#     features = feature_pipeline.transform(df)
 
-# ##################################################
-
-
-
-###    Fit train model to the pipeline   #######
-if training_set == True:
-    model = LogisticRegression(fit_intercept=True)
-    model.fit(features.values, y)    #np.log(y)) # <---- note: the np.log transformation
-####  Make predictions against the training set
-    y_hat = model.predict(features.values)
-           #np.exp(y_hat)         ## <----- note: the exp to transform back
+# # ##################################################
 
 
-len(y_hat)
-len(y)
-len(features)
+
+# ###    Fit train model to the pipeline   #######
+# if training_set == True:
+#     model = LogisticRegression(fit_intercept=True)
+#     model.fit(features.values, y)    #np.log(y)) # <---- note: the np.log transformation
+# ####  Make predictions against the training set
+#     y_hat = model.predict(features.values)
+#            #np.exp(y_hat)         ## <----- note: the exp to transform back
+
+
+# len(y_hat)
+# len(y)
+# len(features)
+
+
 
 #####################   Make the predictions ######################
 
-prob_y = []
 
-for idx , est in enumerate(list(y_hat)):
-    total = []
-    for _ in range(n, 0, -1):
-        total += est
-    prob_y.append(float(total) / n)
+df.shape
+
+
+
+######################################
+
+cols = ['time_cycles', 't2_Inlet',
+       't24_lpc', 't30_hpc', 't50_lpt', 'p2_fip', 'p15_pby', 'p30_hpc',
+       'nf_fan_speed', 'nc_core_speed', 'epr_p50_p2', 'ps_30_sta_press',
+       'phi_fp_ps30', 'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat',
+       'far_b_air_rat', 'htbleed_enthalpy', 'nf_dmd_dem_fan_sp', 'pcn_fr_dmd',
+       'w31_hpt_cool_bl', 'w32_lpt_cool_bl']
+
+y = df.above_mean_life
+
+
+
+#####        fit model and use to predict probbilities        #####
+model = LogisticRegression( C=1000)
+model.fit(df[cols], y)
+
+y_hat = model.predict_proba(df[cols])
+len(y_hat)
+
+
+##### Based on the number of cycles in the begining      ##########
+        ################# if prob don't work     #############
+
+prob_y = []
+total = 0
+for idx, est in enumerate(y_hat.tolist()):
+    # print(est)
+    # print(type(est))
+    total += est[0]
+    if (idx+1) % n == 0 and idx!= 0:
+        prob_y.append( (float(total) / n) )
+        print(n, idx, est)
+        total = 0
+    else:
+        continue
+
+    # print(total)
+    
 
 prob_y
+len(prob_y)
+
+# y_hat = prob_y
+
+
+y_act = []
+total = 0
+for idx, est in enumerate(y):
+    # print(est)
+    # print(type(est))
+    # total += est
+    if (idx+1) % n == 0 and idx != 0:
+        y_act.append( est)
+        print(n, idx, est)
+        total = 0
+    # if (idx+1) == len(y):
+    #     y_act.append( total / n )
+    #     print(n, idx, est)
+    #     total = 0
+    else:
+        continue
+
+    # print(total)
+    
+
+y_act
+len(y_act)
+
+### Log Loss func
+log_loss(np.array(y_act), np.array(prob_y) ) 
+### Log Loss func
+# log_loss(np.array(y_act), np.array(prob_y) )
+# 0.8683509089053743
+# # n = 25 log loss
+# log_loss(np.array(y_act), np.array(prob_y) ) 
+# 0.8789643598592655
+# ### Log Loss func
+# ... log_loss(np.array(y_act), np.array(prob_y) ) 
+# 0.7886718412288982
 
 
 
+fig, (ax0, ax1, ax3) = plt.subplots(1,3, figsize=(18,6))
+dfp = calculate_threshold_values(model.predict_proba(df[cols])[:,1], y)
+plot_roc(ax0, dfp)
+plot_precision_recall(ax1, dfp)
+plot_decision_boundary(df[cols].values, y, model, ax3)   # ax3
+plt.show()
 
 
+####  Plot predictions from data against the actual values ########
+if make_plots==True:
+    plt.scatter(range(0,len(y_act)), y_act, alpha = 0.8, color='blue')
+    plt.plot(range(0,len(prob_y)), prob_y, '-r', label='Estimated Prob')
+    plt.title('Above / Below Mean Probabilities')
+    plt.xlabel('$\hat {p}$ from training set')
+    plt.ylabel( 'Actuals from training set')
+    plt.ylim(-0.1,1.1)
+    plt.show()
+###
+plt.scatter(range(0,len(y_act)), y_act, alpha = 0.8, color='blue')
+plt.plot(range(0,len(prob_y)), prob_y, '-r', label='Estimated Prob')
+plt.title('Above / Below Mean Probabilities First: ' + str(n) + ' Observations')
+plt.xlabel('$\hat {p}$ from training set')
+plt.ylabel( 'Actuals from training set')
+plt.ylim(-0.1,1.1)
+plt.vlines( list(range(1,len(y_act)+1)), 0, 1 ) 
+plt.show()
 
 
 
@@ -562,7 +579,7 @@ prob_y
 ####################################################################
 
 
-###    Fit test model to the pipeline   #######
+###    Fit Test Data to the model   #######
 if training_set == False:
     model = LogisticRegression(fit_intercept=True)
     model.fit(features.values, y ) #np.log(y)) # <---- note: the np.log transformation
@@ -738,7 +755,7 @@ if make_plots==True and training_set==False:
 
 
 if make_plots==True and training_set==True:
-    fig, axs = plot_many_predicteds_vs_actuals(train_features, y_hat)
+    fig, axs = plot_many_predicteds_vs_actuals(train_features, prob_y)
     # fig.tight_layout()df
     plt.show()
 
