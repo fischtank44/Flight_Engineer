@@ -106,6 +106,8 @@ transform_dataframes_add_ys(data_frames_to_transform)
 cols_to_use = small_features_list
 df = df1          #<----- #This is the dataframe to use for the model
 target_variable = 'above_mean_life'  #   or 'y_failure'
+n = 30   # <---- set the number of initial cycles to check
+                # for long vs short life. 
 
 ##########################################################
 # It will be a countdown of the total cycles for training set  ######
@@ -340,7 +342,7 @@ if training_set == False:
 # ## This will make the train test split for this model ####
 # ytrain = df_new_train['y_failure']
 # X_train_features = df_new_train[train_features]
-# ytest = df_new_test['y_failure']
+# y = df_new_test['y_failure']
 # X_test_feaures = df_new_test[train_features]
 
 
@@ -480,11 +482,11 @@ feature_pipeline = FeatureUnion([
     ('p30_hpc', p30_fit),
     ('t50_lpt', t50_fit),
     ('nf_fan_speed', nf_fan_fit),
-    # ('nc_core_speed', nc_core_fit),
+    ('nc_core_speed', nc_core_fit),
     ('ps_30_sta_press', ps_30_fit),
     ('phi_fp_ps30', phi_fp_fit),
     ('nrf_cor_fan_sp', nrf_cor_fit),
-    # ('nrc_core_sp', nrc_core_fit),
+    ('nrc_core_sp', nrc_core_fit),
     ("bpr_bypass_rat", bpr_bypass_fit),
     ("htbleed_enthalpy", htbleed_fit),
     ("w31_hpt_cool_bl", w31_fit),
@@ -527,7 +529,7 @@ if training_set == False:
 ###    Fit train model to the pipeline   #######
 if training_set == True:
     model = LogisticRegression(fit_intercept=True)
-    model.fit(features.values, y)    #np.log(ytrain)) # <---- note: the np.log transformation
+    model.fit(features.values, y)    #np.log(y)) # <---- note: the np.log transformation
 ####  Make predictions against the training set
     y_hat = model.predict(features.values)
            #np.exp(y_hat)         ## <----- note: the exp to transform back
@@ -537,18 +539,39 @@ len(y_hat)
 len(y)
 len(features)
 
+#####################   Make the predictions ######################
+
+prob_y = []
+
+for idx , est in enumerate(list(y_hat)):
+    total = []
+    for _ in range(n, 0, -1):
+        total += est
+    prob_y.append(float(total) / n)
+
+prob_y
+
+
+
+
+
+
+
+
+
+####################################################################
 
 
 ###    Fit test model to the pipeline   #######
 if training_set == False:
     model = LogisticRegression(fit_intercept=True)
-    model.fit(features.values, ytest ) #np.log(ytest)) # <---- note: the np.log transformation
+    model.fit(features.values, y ) #np.log(y)) # <---- note: the np.log transformation
 ####  Make predictions against the test set
     y_hat = model.predict(features.values)
     y_hat = y_hat     # np.exp(y_hat)                ## <----- note: the exp to transform back
 
 len(y_hat)
-len(ytest)
+len(y)
 len(features)
 
 
@@ -557,14 +580,12 @@ len(features)
 
 ####  Plot predictions from data against the actual values ########
 if make_plots==True:
-    x = list(range( 1,360))
-    y = x
-    plt.scatter(y_hat, ytrain, alpha = 0.1, color='blue')
-    plt.plot(x, y, '-r', label='y=2x+1')
+    plt.scatter(y_hat, y, alpha = 0.1, color='blue')
+    #plt.plot(x, y, '-r', label='y=2x+1')
     plt.title('Pipline Predictions with log(y)')
     plt.xlabel('$\hat {y}$ from training set')
     plt.ylabel( 'y actuals from training set')
-    plt.xlim(360,1)
+    plt.ylim(0,1)
     plt.show()
 ###
 
@@ -574,7 +595,7 @@ if make_plots==True:
 if make_plots==True:
     fig, ax = plt.subplots(figsize=(15,15) )
     ax.plot(list(range(1, len(y_hat) + 1)) , y_hat, '.r', label='predicted')
-    ax.plot(list(range(1, len(ytrain) + 1 )) , ytrain, '.b' , label='actual')
+    ax.plot(list(range(1, len(y) + 1 )) , y, '.b' , label='actual')
     plt.xlabel('Index of Value')
     plt.ylabel( 'Cycles to Fail')
     ax.legend()
@@ -597,7 +618,7 @@ if make_plots==True and training_set==True:
         print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
         # fig, ax = plt.subplots(figsize=(15,15) )
         ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
-        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '-b' , label='actual')
+        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y[start_idx : end_idx] , '-b' , label='actual')
         ax.set_title("Engine # " + str(train_engines[idx]), size=6)
         # plt.tick_params(axis='both', which='major', labelsize=8)
         # plt.tick_params(axis='both', which='minor', labelsize=6)
@@ -629,9 +650,9 @@ if make_plots==True and training_set==False:
         print(start_idx, end_idx, test_eng_max_cycles[idx], end_idx-start_idx)
         # fig, ax = plt.subplots(figsize=(15,15) )
         # ax.plot(y_hat[start_idx : end_idx], list(range(train_eng_max_cycles[idx], 0, -1)), '.r', label='predicted')
-        # ax.plot(ytrain[start_idx : end_idx] , list(range(train_eng_max_cycles[idx], 0, -1)) , '-b' , label='actual')
+        # ax.plot(y[start_idx : end_idx] , list(range(train_eng_max_cycles[idx], 0, -1)) , '-b' , label='actual')
         ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
-        ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , ytest[start_idx : end_idx] , '-b' , label='actual')
+        ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , y[start_idx : end_idx] , '-b' , label='actual')
         ax.set_title("Engine # " + str(test_engines[idx]), size=6)
         # plt.tick_params(axis='both', which='major', labelsize=8)
         # plt.tick_params(axis='both', which='minor', labelsize=6)
@@ -669,7 +690,7 @@ if make_plots==True and training_set==True:
         print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
         fig, ax = plt.subplots(figsize=(15,15) )
         ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
-        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '.b' , label='actual')
+        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y[start_idx : end_idx] , '.b' , label='actual')
         plt.title('Engine #: ' + str(e))
         plt.xlabel('Cycles to Fail')
         plt.ylabel( 'Cycles Used')
@@ -690,7 +711,7 @@ if make_plots==True and training_set==False:
         print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
         fig, ax = plt.subplots(figsize=(15,15) )
         ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
-        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '.b' , label='actual')
+        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y[start_idx : end_idx] , '.b' , label='actual')
         plt.title('Engine #: ' + str(e))
         plt.xlabel('Cycles to Fail')
         plt.ylabel( 'Cycles Used')
@@ -732,13 +753,18 @@ len(train_features)
 train_features
 len(df_new_train)
 
+#########################################################
+
+
+
+
 ##########################    Scoreing Section   ###############
 
 
 
 #### Score of the first model against the training set.  
 ## First score from basic linear regression model   ####
-log_knot_model = r2(ytrain, y_hat)
+log_knot_model = r2(y, y_hat)
 log_knot_model
 # time_knot_model
 # first_knot_model
@@ -754,26 +780,26 @@ log_knot_model
 
 ##### R-squared for the last n number of observations  #####
 #
-ytrain
+y
 y_hat
 
-r2_for_last_n_cycles(y_hat , ytrain, last_n=150)
-r2_for_last_n_cycles(y_hat , ytrain, last_n=100)
-r2_for_last_n_cycles(y_hat , ytrain, last_n=75)
-r2_for_last_n_cycles(y_hat , ytrain, last_n=50)
-r2_for_last_n_cycles(y_hat , ytrain, last_n=25)
-r2_for_last_n_cycles(y_hat , ytrain, last_n=15)
-r2_for_last_n_cycles(y_hat , ytrain, last_n=10)
-r2_for_last_n_cycles(y_hat , ytrain, last_n=5)
+r2_for_last_n_cycles(y_hat , y, last_n=150)
+r2_for_last_n_cycles(y_hat , y, last_n=100)
+r2_for_last_n_cycles(y_hat , y, last_n=75)
+r2_for_last_n_cycles(y_hat , y, last_n=50)
+r2_for_last_n_cycles(y_hat , y, last_n=25)
+r2_for_last_n_cycles(y_hat , y, last_n=15)
+r2_for_last_n_cycles(y_hat , y, last_n=10)
+r2_for_last_n_cycles(y_hat , y, last_n=5)
 
 ###################   Make a list of r squared values for plotting   ##########
 
 if training_set == True:
-    r2_values = r2_generator_last_n_cycles(y_hat , ytrain, 200)
+    r2_values = r2_generator_last_n_cycles(y_hat , y, 200)
 
 
 if training_set == False:
-    r2_values = r2_generator_last_n_cycles(y_hat , ytest, 200)
+    r2_values = r2_generator_last_n_cycles(y_hat , y, 200)
 
 ########  Plot the r2 values as the number of cycles remaining approaches the end #######
 
@@ -808,12 +834,12 @@ if make_plots == True:
 # This creates a list of models, one for each bootstrap sample.
 
 
-feature_pipeline.fit(df_new_train)
-features_f = feature_pipeline.transform(df_new_train)
+feature_pipeline.fit(df)
+features = feature_pipeline.transform(df)
 
 
 model = LinearRegression(fit_intercept=True)
-model.fit(features_f.values, np.log(df_new_train[target_variable])) 
+model.fit(features.values, df[target_variable] ) 
 
 cols_to_use = [
     'time_cycles', 
@@ -822,11 +848,11 @@ cols_to_use = [
     't50_lpt', 
     'p30_hpc', 
     'nf_fan_speed', 
-    # 'nc_core_speed', 
+    'nc_core_speed', 
     'ps_30_sta_press', 
     'phi_fp_ps30', 
     'nrf_cor_fan_sp', 
-    # 'nrc_core_sp', 
+    'nrc_core_sp', 
     'bpr_bypass_rat', 
     'htbleed_enthalpy', 
     'w31_hpt_cool_bl', 
@@ -837,9 +863,9 @@ cols_to_use = [
 # features = feature_pipeline.transform(df)
 
 models = bootstrap_train(
-    LinearRegression, 
-    features_f.values, 
-    np.log(df_new_train[target_variable].values),
+    LogisticRegression, 
+    features.values, 
+    df[target_variable].values,
     bootstraps=500,
     fit_intercept=True
 )
@@ -851,7 +877,7 @@ models = bootstrap_train(
 
 fig, axs = plot_partial_dependences(
      model, 
-     X=df_new_train,
+     X=df,
      var_names=cols_to_use,
      pipeline=feature_pipeline,
      bootstrap_models=models,

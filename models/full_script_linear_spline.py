@@ -96,7 +96,7 @@ small_features_list = [
 #######      List of vaiables and features for model    #######
 
 
-training_set = True
+training_set = False
 make_plots = False
 data_frames_to_transform = [df1, df2, df3 , df4]
 transform_dataframes_add_ys(data_frames_to_transform)
@@ -299,17 +299,23 @@ stats.describe(test_eng_max_cycles)
 ###########@@@@@@@@    Toggle commments to change target   @@@@@########################
 
 
-## This will make the train test split for this model ####
-ytrain = df_new_train[target_variable]
-X_train_features = df_new_train[train_features]
-ytest = df_new_test[target_variable]
-X_test_feaures = df_new_test[train_features]
+## This will make the train split for this model ####
+if training_set == True:
+    y = df_new_train[target_variable]
+    X_train_features = df_new_train[train_features]
+
+
+
+## This will make the test split. ########
+if training_set == False:
+    y = df_new_test[target_variable]
+    X_test_feaures = df_new_test[train_features]
 
 
 
 # ###########                Train to y_failure (0-1)                ######################
 # ## This will make the train test split for this model ####
-# ytrain = df_new_train['y_failure']
+# y = df_new_train['y_failure']
 # X_train_features = df_new_train[train_features]
 # ytest = df_new_test['y_failure']
 # X_test_feaures = df_new_test[train_features]
@@ -498,12 +504,12 @@ if training_set == False:
 ###    Fit train model to the pipeline   #######
 if training_set == True:
     model = LinearRegression(fit_intercept=True)
-    model.fit(features.values, np.log(ytrain)) # <---- note: the np.log transformation
+    model.fit(features.values, np.log(y)) # <---- note: the np.log transformation
 ####  Make predictions against the training set
     y_hat = model.predict(features.values)
     y_hat = np.exp(y_hat)                ## <----- note: the exp to transform back
 len(y_hat)
-len(ytrain)
+len(y)
 len(features)
 
 
@@ -513,13 +519,13 @@ len(features)
 ###    Fit test model to the pipeline   #######
 if training_set == False:
     model = LinearRegression(fit_intercept=True)
-    model.fit(features.values, np.log(ytest)) # <---- note: the np.log transformation
+    model.fit(features.values, np.log(y)) # <---- note: the np.log transformation
 ####  Make predictions against the test set
     y_hat = model.predict(features.values)
     y_hat = np.exp(y_hat)                ## <----- note: the exp to transform back
 
 len(y_hat)
-len(ytest)
+len(y)
 len(features)
 
 
@@ -530,7 +536,7 @@ len(features)
 if make_plots==True:
     x = list(range( 1,360))
     y = x
-    plt.scatter(y_hat, ytrain, alpha = 0.1, color='blue')
+    plt.scatter(y_hat, y, alpha = 0.1, color='blue')
     plt.plot(x, y, '-r', label='y=2x+1')
     plt.title('Pipline Predictions with log(y)')
     plt.xlabel('$\hat {y}$ from training set')
@@ -545,7 +551,7 @@ if make_plots==True:
 if make_plots==True:
     fig, ax = plt.subplots(figsize=(15,15) )
     ax.plot(list(range(1, len(y_hat) + 1)) , y_hat, '.r', label='predicted')
-    ax.plot(list(range(1, len(ytrain) + 1 )) , ytrain, '.b' , label='actual')
+    ax.plot(list(range(1, len(y) + 1 )) , y, '.b' , label='actual')
     plt.xlabel('Index of Value')
     plt.ylabel( 'Cycles to Fail')
     ax.legend()
@@ -568,7 +574,7 @@ if make_plots==True and training_set==True:
         print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
         # fig, ax = plt.subplots(figsize=(15,15) )
         ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
-        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '-b' , label='actual')
+        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y[start_idx : end_idx] , '-b' , label='actual')
         ax.set_title("Engine # " + str(train_engines[idx]), size=6)
         # plt.tick_params(axis='both', which='major', labelsize=8)
         # plt.tick_params(axis='both', which='minor', labelsize=6)
@@ -600,9 +606,9 @@ if make_plots==True and training_set==False:
         print(start_idx, end_idx, test_eng_max_cycles[idx], end_idx-start_idx)
         # fig, ax = plt.subplots(figsize=(15,15) )
         # ax.plot(y_hat[start_idx : end_idx], list(range(train_eng_max_cycles[idx], 0, -1)), '.r', label='predicted')
-        # ax.plot(ytrain[start_idx : end_idx] , list(range(train_eng_max_cycles[idx], 0, -1)) , '-b' , label='actual')
+        # ax.plot(y[start_idx : end_idx] , list(range(train_eng_max_cycles[idx], 0, -1)) , '-b' , label='actual')
         ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
-        ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , ytest[start_idx : end_idx] , '-b' , label='actual')
+        ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , y[start_idx : end_idx] , '-b' , label='actual')
         ax.set_title("Engine # " + str(test_engines[idx]), size=6)
         # plt.tick_params(axis='both', which='major', labelsize=8)
         # plt.tick_params(axis='both', which='minor', labelsize=6)
@@ -640,7 +646,7 @@ if make_plots==True and training_set==True:
         print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
         fig, ax = plt.subplots(figsize=(15,15) )
         ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
-        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '.b' , label='actual')
+        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y[start_idx : end_idx] , '.b' , label='actual')
         plt.title('Engine #: ' + str(e))
         plt.xlabel('Cycles to Fail')
         plt.ylabel( 'Cycles Used')
@@ -661,7 +667,7 @@ if make_plots==True and training_set==False:
         print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
         fig, ax = plt.subplots(figsize=(15,15) )
         ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
-        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , ytrain[start_idx : end_idx] , '.b' , label='actual')
+        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y[start_idx : end_idx] , '.b' , label='actual')
         plt.title('Engine #: ' + str(e))
         plt.xlabel('Cycles to Fail')
         plt.ylabel( 'Cycles Used')
@@ -709,7 +715,7 @@ len(df_new_train)
 
 #### Score of the first model against the training set.  
 ## First score from basic linear regression model   ####
-log_knot_model = r2(ytrain, y_hat)
+log_knot_model = r2(y, y_hat)
 log_knot_model
 # time_knot_model
 # first_knot_model
@@ -725,26 +731,26 @@ log_knot_model
 
 ##### R-squared for the last n number of observations  #####
 #
-ytrain
+y
 y_hat
 
-r2_for_last_n_cycles(y_hat , ytrain, last_n=150)
-r2_for_last_n_cycles(y_hat , ytrain, last_n=100)
-r2_for_last_n_cycles(y_hat , ytrain, last_n=75)
-r2_for_last_n_cycles(y_hat , ytrain, last_n=50)
-r2_for_last_n_cycles(y_hat , ytrain, last_n=25)
-r2_for_last_n_cycles(y_hat , ytrain, last_n=15)
-r2_for_last_n_cycles(y_hat , ytrain, last_n=10)
-r2_for_last_n_cycles(y_hat , ytrain, last_n=5)
+r2_for_last_n_cycles(y_hat , y, last_n=150)
+r2_for_last_n_cycles(y_hat , y, last_n=100)
+r2_for_last_n_cycles(y_hat , y, last_n=75)
+r2_for_last_n_cycles(y_hat , y, last_n=50)
+r2_for_last_n_cycles(y_hat , y, last_n=25)
+r2_for_last_n_cycles(y_hat , y, last_n=15)
+r2_for_last_n_cycles(y_hat , y, last_n=10)
+r2_for_last_n_cycles(y_hat , y, last_n=5)
 
 ###################   Make a list of r squared values for plotting   ##########
 
 if training_set == True:
-    r2_values = r2_generator_last_n_cycles(y_hat , ytrain, 200)
+    r2_values = r2_generator_last_n_cycles(y_hat , y, 200)
 
 
 if training_set == False:
-    r2_values = r2_generator_last_n_cycles(y_hat , ytest, 200)
+    r2_values = r2_generator_last_n_cycles(y_hat , y, 200)
 
 ########  Plot the r2 values as the number of cycles remaining approaches the end #######
 
@@ -759,8 +765,7 @@ if make_plots == True:
     plt.ylabel( 'R Squared Value')
     plt.show()
 
-### Plot of r-squared as the number of observations approaches 1  #########
-
+# ### Plot of r-squared as the number of observations approaches 1  #########
 
 
 
