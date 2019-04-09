@@ -95,7 +95,6 @@ features.columns[3]
 
 
 
-
 for _ in range(len(model.coef_)):
     print(str(features.columns[_]) + " coef " + 
     str(model.coef_[_]))
