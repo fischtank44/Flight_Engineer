@@ -50,6 +50,7 @@ from r_squared_funcs import (
     r2_generator_last_n_cycles)
 from enginedatatransformer import transform_dataframes_add_ys
 from plot_pred_vs_act import plot_many_predicteds_vs_actuals
+# from export_linear_model import export_linear_model_to_txt
 
 ##################################
 
@@ -177,6 +178,7 @@ col = df.columns
 for c in col:
   if (df[c].describe()[2] ) >= .01:
       train_features.append(c)
+
 
 train_features
 train_features = [ 
@@ -356,7 +358,7 @@ if make_plots==True:
         ax.set_title(name, fontsize=7)
     plt.show()
 
-make_plots =True
+
 
 #### Plot each feature individually. 
 ###    (ax, df, y, var_name,
@@ -812,64 +814,100 @@ if make_plots == True:
 # This creates a list of models, one for each bootstrap sample.
 
 
-feature_pipeline.fit(df_new_train)
-features_f = feature_pipeline.transform(df_new_train)
+# feature_pipeline.fit(df_new_train)
+# features_f = feature_pipeline.transform(df_new_train)
 
 
-model = LinearRegression(fit_intercept=True)
-model.fit(features_f.values, np.log(df_new_train[target_variable])) 
+# model = LinearRegression(fit_intercept=True)
+# model.fit(features_f.values, np.log(df_new_train[target_variable])) 
 
-cols_to_use = [
-    'time_cycles', 
-    't24_lpc', 
-    't30_hpc', 
-    't50_lpt', 
-    'p30_hpc', 
-    'nf_fan_speed', 
-    # 'nc_core_speed', 
-    'ps_30_sta_press', 
-    'phi_fp_ps30', 
-    'nrf_cor_fan_sp', 
-    # 'nrc_core_sp', 
-    'bpr_bypass_rat', 
-    'htbleed_enthalpy', 
-    'w31_hpt_cool_bl', 
-    'w32_lpt_cool_bl']
-
-
-# feature_pipeline.fit(df)
-# features = feature_pipeline.transform(df)
-
-models = bootstrap_train(
-    LinearRegression, 
-    features_f.values, 
-    np.log(df_new_test[target_variable].values),
-    bootstraps=500,
-    fit_intercept=True
-)
+# cols_to_use = [
+#     'time_cycles', 
+#     't24_lpc', 
+#     't30_hpc', 
+#     't50_lpt', 
+#     'p30_hpc', 
+#     'nf_fan_speed', 
+#     # 'nc_core_speed', 
+#     'ps_30_sta_press', 
+#     'phi_fp_ps30', 
+#     'nrf_cor_fan_sp', 
+#     # 'nrc_core_sp', 
+#     'bpr_bypass_rat', 
+#     'htbleed_enthalpy', 
+#     'w31_hpt_cool_bl', 
+#     'w32_lpt_cool_bl']
 
 
-# fig, axs = plot_bootstrap_coefs(models, features.columns, n_col=4)
+# # feature_pipeline.fit(df)
+# # features = feature_pipeline.transform(df)
+
+# models = bootstrap_train(
+#     LinearRegression, 
+#     features_f.values, 
+#     np.log(df_new_test[target_variable].values),
+#     bootstraps=500,
+#     fit_intercept=True
+# )
+
+
+# # fig, axs = plot_bootstrap_coefs(models, features.columns, n_col=4)
+# # plt.show()
+
+
+# fig, axs = plot_partial_dependences(
+#      model, 
+#      X=df_new_train,
+#      var_names=cols_to_use,
+#      pipeline=feature_pipeline,
+#      bootstrap_models=models,
+#      y=None#np.log(df[target_variable]).values  
+#      )
+# # fig.tight_layout()
+
+
 # plt.show()
-
-
-fig, axs = plot_partial_dependences(
-     model, 
-     X=df_new_train,
-     var_names=cols_to_use,
-     pipeline=feature_pipeline,
-     bootstrap_models=models,
-     y=None#np.log(df[target_variable]).values  
-     )
-# fig.tight_layout()
-
-
-plt.show()
 
 
 
 df_new_train.head()
 df_new_train.shape
+
+
+#######################################################################3
+########################################################################
+########################################################################
+###########################     Out      ###############################
+##########################################################################
+
+# export_linear_model_to_txt( 'firsttimeoutofthegate' )
+
+
+
+
+import sys
+    
+    
+def export_linear_model_to_txt( file_name ):
+    feat = [i for i in features.columns] 
+    coef = [float(j) for j in model.coef_]
+    out = []
+    for fe, co in zip(feat, coef): 
+    # print(fe, co)
+        out.append([fe , co ])
+    sys.stdout = open(file_name+'.txt', 'w')
+    print(out)
+
+
+export_linear_model_to_txt( 'firsttimeoutofthegate' )
+
+
+#############################  Golden Ticket  #####################################
+
+#############################                 #####################################
+
+
+
 
 
 

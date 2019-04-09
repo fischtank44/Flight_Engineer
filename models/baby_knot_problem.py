@@ -91,7 +91,6 @@ type(features)
 features.columns[0]
 features.columns[1]
 features.columns[2]
-features.columns[3]
 
 
 
@@ -100,22 +99,27 @@ for _ in range(len(model.coef_)):
     str(model.coef_[_]))
 
 
-for _ in x_fit:
-    print(_)
-
 
 feat = [i for i in features.columns] 
-coef = [j for j in float(model.coef_)]
+coef = [float(j) for j in model.coef_]
 print(zip( feat , coef  ) )
 
+model.coef_
 
 
 
 # printing players and scores. 
+out = []
 for fe, co in zip(feat, coef): 
-    print(fe, co)
-    print ("Feat :  %s     Coef : %f" %(fe, co)) 
+    # print(fe, co)
+    out.append([fe , co ])
+    # print ("Feat :  %s     Coef : %f" %(fe, co)) 
+
+out
 
 
+import sys
+sys.stdout = open('knot_model', 'w')
+print(out)
 
 
