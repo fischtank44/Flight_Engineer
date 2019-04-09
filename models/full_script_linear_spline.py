@@ -120,7 +120,7 @@ target_variable = 'cycles_to_fail'  #   or 'y_failure'
 
 ## this will plot all columns to check for variation within the feature data
 if make_plots==True:
-    for name in col:
+    for name in df.columns:
         df.plot.scatter( target_variable, name, alpha = .3)
         plt.show()
 #
@@ -508,6 +508,8 @@ if training_set == True:
 ####  Make predictions against the training set
     y_hat = model.predict(features.values)
     y_hat = np.exp(y_hat)                ## <----- note: the exp to transform back
+
+
 len(y_hat)
 len(y)
 len(features)
@@ -518,15 +520,37 @@ len(features)
 
 ###    Fit test model to the pipeline   #######
 if training_set == False:
-    model = LinearRegression(fit_intercept=True)
-    model.fit(features.values, np.log(y)) # <---- note: the np.log transformation
+    # model = LinearRegression(fit_intercept=True)
+    # model.fit(features.values, np.log(y)) # <---- note: the np.log transformation
 ####  Make predictions against the test set
     y_hat = model.predict(features.values)
     y_hat = np.exp(y_hat)                ## <----- note: the exp to transform back
 
+
 len(y_hat)
 len(y)
 len(features)
+
+
+
+###################################################################
+########################   Export Model     ########################
+
+import pickle
+
+
+
+s = pickle.dumps(model)
+clf2 = pickle.loads(s)
+
+# # clf2.predict(X[0:1])
+# array([0])
+# y[0]
+
+
+
+from joblib import dump, load
+dump(model, 'knot_spline.joblib') 
 
 
 
@@ -725,14 +749,17 @@ log_knot_model
 # 0.7272227017732488
 #log_knot_model
 # 0.7273228097635444
-
-
+# prunded log_knot_model
+#  0.6624887239647439
+# log_knot_model- test real number
+#   0.7118862211077583
 
 
 ##### R-squared for the last n number of observations  #####
 #
-y
-y_hat
+
+# y
+# y_hat
 
 r2_for_last_n_cycles(y_hat , y, last_n=150)
 r2_for_last_n_cycles(y_hat , y, last_n=100)
@@ -815,7 +842,7 @@ cols_to_use = [
 models = bootstrap_train(
     LinearRegression, 
     features_f.values, 
-    np.log(df_new_train[target_variable].values),
+    np.log(df_new_test[target_variable].values),
     bootstraps=500,
     fit_intercept=True
 )
