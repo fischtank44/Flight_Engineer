@@ -96,7 +96,7 @@ small_features_list = [
 #######      List of vaiables and features for model    #######
 
 
-training_set = False
+training_set = True
 make_plots = False
 data_frames_to_transform = [df1, df2, df3 , df4]
 transform_dataframes_add_ys(data_frames_to_transform)
@@ -356,7 +356,7 @@ if make_plots==True:
         ax.set_title(name, fontsize=7)
     plt.show()
 
-
+make_plots =True
 
 #### Plot each feature individually. 
 ###    (ax, df, y, var_name,
@@ -552,9 +552,10 @@ clf2 = pickle.loads(s)
 from joblib import dump, load
 dump(model, 'knot_spline.joblib') 
 
+pickle.dump(model, open("model.pkl","wb"))
 
-
-
+###############################################################
+###############################################################
 
 ####  Plot predictions from data against the actual values ########
 if make_plots==True:

@@ -118,7 +118,7 @@ make_plots = False
 cols_to_use = small_features_list
 df = df1          #<----- #This is the dataframe to use for the model
 target_variable = 'above_mean_life'  #   or 'y_failure'
-n = 50   # <---- set the number of initial cycles to check
+n = 75   # <---- set the number of initial cycles to check
                 # for long vs short life. 
 
 ##########################################################
@@ -174,6 +174,8 @@ if make_plots==True:
 
 #####   adjust the data frame to choose 20 % of the engines by unmber and 
 #####   train to a sample of 80% by number and 20% saved for test data.
+
+
 # test_engines = list(np.random.choice(range(1,101), 20, replace= False))
 test_engines = [4, 18, 19, 21, 28, 33, 42, 45, 46, 50, 61, 73, 74, 78, 82, 83, 84, 86, 92, 94]
 
