@@ -108,13 +108,13 @@ small_features_list = [
 
 
 training_set = True
-make_plots = False
+make_plots = True
 data_frames_to_transform = [df1, df2, df3 , df4]
 transform_dataframes_add_ys(data_frames_to_transform)
 cols_to_use = small_features_list
 df = df1          #<----- #This is the dataframe to use for the model
 target_variable = 'above_mean_life'  #   or 'y_failure'
-n = 75   # <---- set the number of initial cycles to check
+n = 50   # <---- set the number of initial cycles to check
                 # for long vs short life. 
 
 ##########################################################
@@ -155,20 +155,6 @@ if make_plots==True:
 
 
 
-#####         Scatter matrix using cycles to fail        #####
-if make_plots==True:
-    scatter_matrix = pd.scatter_matrix(df[cols_to_use], alpha=0.2, figsize=(20, 20), diagonal='kde')
-
-
-
-
-if make_plots==True:
-    for ax in scatter_matrix.ravel():
-            ax.set_xlabel(ax.get_xlabel(), fontsize = 6, rotation = 90)
-            ax.set_ylabel(ax.get_ylabel(), fontsize = 6, rotation = 0)
-    plt.show()
-
-
 #####                                                       ##### 
 
 
@@ -185,13 +171,13 @@ if make_plots==True:
 #   print (df[c].describe()[2] ) 
 
 
-### This will remove features based the standard deviation for each column
-train_features = []
-limit = .01
-col = df.columns
-for c in col:
-  if (df[c].describe()[2] ) >= .01:
-      train_features.append(c)
+# ### This will remove features based the standard deviation for each column
+# train_features = []
+# limit = .01
+# col = df.columns
+# for c in col:
+#   if (df[c].describe()[2] ) >= .01:
+#       train_features.append(c)
 
 train_features
 train_features = [ 
@@ -352,102 +338,33 @@ df = training_frame_log
 
 
 
-# ###########                Train to y_failure (0-1)                ######################
-# ## This will make the train test split for this model ####
-# ytrain = df_new_train['y_failure']
-# X_train_features = df_new_train[train_features]
-# y = df_new_test['y_failure']
-# X_test_feaures = df_new_test[train_features]
-
-
-
-
-### Hold for future use  #######
-# Xtrain, Xtest, ytrain, ytest = train_test_split(X_features, y, test_size = .2, random_state=137)
-# Xtrain.shape
-# Xtest.shape
-# ytrain.shape
-# ytest.shape
-
-
-
-
-# #####   Plot the data from the first model and evaluate the residuals
-
-# plt.scatter(L_y_predicted, ytrain, alpha = 0.1)
-# plt.xlabel('y hat from training set')
-# plt.ylabel( 'y values from training set')
-# plt.show()
-# ###
-
-
-
 # Begin spline analysis of each significant feature
 ###### plot the full range of each engine against the cycles to fail
 if make_plots==True:
     fig, axs = plt.subplots(3, 5, figsize=(14, 8))
     univariate_plot_names = df[train_features]                                     #columns[:-1]
     for name, ax in zip(univariate_plot_names, axs.flatten()):
-        plot_univariate_smooth(ax,
-                            df[target_variable],
-                            df[name].values.reshape(-1, 1),
-                            bootstrap=100)
+        plot_one_univariate(ax, df, target_variable, name )        
+        # print(name, ax)
+        # plot_one_univariate(ax, df, target_variable, col )
         ax.set_title(name, fontsize=7)
     plt.show()
 
 
-
+################  The plot is showing some level of predictive ability   ############
+####   Zoom plot of each feature #### Only use for close analysis ######
 #### Plot each feature individually. 
 ###    (ax, df, y, var_name,
-if make_plots==True:
-    for col in train_features:
-        fig, ax = plt.subplots(figsize=(12, 3))
-        plot_one_univariate(ax, df, target_variable, col )
-        ax.set_title("Evaluation of: " + str(col))
-        plt.xlabel(col)
-        plt.ylabel( 'Cycles to Fail')
-        plt.show()
+# if make_plots==True:
+#     for col in train_features:
+#         fig, ax = plt.subplots(figsize=(12, 3))
+#         plot_one_univariate(ax, df, target_variable, col )
+#         ax.set_title("Evaluation of: " + str(col))
+#         plt.xlabel(col)
+#         plt.ylabel( 'Cycles to Fail')
+#         plt.show()
 
 
-
-
-
-
-#### Build out the new dataframes with each knot  
-# 
-# 
-# ####   Full transformation of data frame  using pipline ##########
-# feature_pipeline.fit(df)
-# features = feature_pipeline.transform(df)
-
-#########################################################
-
-
-#   #### Must use the 80 engine traing set !!!!!!!   
-# if training_set == True:
-#     feature_pipeline.fit(df)
-#     features = feature_pipeline.transform(df)
-
-# ####################################################
-
-  
-# # #### Build out the new dataframes with each knot   
-# # #### Must use the 20 engine test set !!!!!!!   
-# if training_set == False:
-#     feature_pipeline.fit(df)
-#     features = feature_pipeline.transform(df)
-
-# # ##################################################
-
-
-
-# ###    Fit train model to the pipeline   #######
-# if training_set == True:
-#     model = LogisticRegression(fit_intercept=True)
-#     model.fit(features.values, y)    #np.log(y)) # <---- note: the np.log transformation
-# ####  Make predictions against the training set
-#     y_hat = model.predict(features.values)
-#            #np.exp(y_hat)         ## <----- note: the exp to transform back
 
 
 # len(y_hat)

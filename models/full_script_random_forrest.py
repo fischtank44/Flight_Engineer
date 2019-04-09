@@ -54,7 +54,7 @@ from sklearn.model_selection import cross_val_score, train_test_split, GridSearc
 
 
 #########################
-###### Self made functions######
+###### Self made/borrowed functions######
 from r_squared_funcs import (
     r2_for_last_n_cycles,
     r2_generator_last_n_cycles)
@@ -118,7 +118,7 @@ make_plots = False
 cols_to_use = small_features_list
 df = df1          #<----- #This is the dataframe to use for the model
 target_variable = 'above_mean_life'  #   or 'y_failure'
-# n = 75   # <---- set the number of initial cycles to check
+n = 50   # <---- set the number of initial cycles to check
                 # for long vs short life. 
 
 ##########################################################
@@ -274,18 +274,29 @@ if training_set == False:
 
 
 
+
+#########   Limit the size of the dataframe to first n observations   ##############################
+def first_n_observations (  df , n):
+    num_observations = range(1, n +1 )
+    train_idx = df['time_cycles'].apply(lambda x: x in num_observations)
+    train_list = list(train_idx)
+    return df.iloc[train_list].copy()
+
+
+
+
 ######################################################################################
 ###### Returns the new data frame with required number of cycles for catagorization   #############
 
 if training_set == True:
     df = first_n_observations(df_new_train,n)
-    y = df.above_mean_life
+    y = df[target_variable]
 
 
 
 if training_set == False:
     df = first_n_observations(df_new_test,n)
-    y = df.above_mean_life
+    y = df[target_variable]
 
 len(df)
 len(y)
@@ -293,7 +304,6 @@ len(features)
 
 
 ##################################################################################################
-
 
 
 ###########             Train to Cycles above and below the mean               ######################
@@ -307,9 +317,9 @@ len(features)
 
 #####################   Make the predictions ######################
 
-
-df.shape
-
+# y = df[target_variable]
+# df.shape
+# y.shape
 
 
 ######################################
@@ -339,6 +349,7 @@ if training_set ==True:
 
 if training_set == True:
     rf.fit(df[cols], y)
+
 
 
 
