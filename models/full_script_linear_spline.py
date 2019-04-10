@@ -97,7 +97,7 @@ small_features_list = [
 #######      List of vaiables and features for model    #######
 
 
-training_set = True
+training_set = False
 make_plots = False
 data_frames_to_transform = [df1, df2, df3 , df4]
 transform_dataframes_add_ys(data_frames_to_transform)
@@ -522,9 +522,6 @@ len(features)
 
 ###    Fit test model to the pipeline   #######
 if training_set == False:
-    # model = LinearRegression(fit_intercept=True)
-    # model.fit(features.values, np.log(y)) # <---- note: the np.log transformation
-####  Make predictions against the test set
     y_hat = model.predict(features.values)
     y_hat = np.exp(y_hat)                ## <----- note: the exp to transform back
 
@@ -536,27 +533,7 @@ len(features)
 
 
 ###################################################################
-########################   Export Model     ########################
 
-import pickle
-
-
-
-s = pickle.dumps(model)
-clf2 = pickle.loads(s)
-
-# # clf2.predict(X[0:1])
-# array([0])
-# y[0]
-
-
-
-from joblib import dump, load
-dump(model, 'knot_spline.joblib') 
-
-pickle.dump(model, open("model.pkl","wb"))
-
-###############################################################
 ###############################################################
 
 ####  Plot predictions from data against the actual values ########
@@ -689,18 +666,19 @@ if make_plots==True and training_set==True:
 # #   the pipeline model for each engine one by one  ###### 
 if make_plots==True and training_set==False:
     start_idx = 0
-    for idx, e in enumerate(train_engines):
-        end_idx = start_idx + train_eng_max_cycles[idx]
-        print(start_idx, end_idx, train_eng_max_cycles[idx], end_idx-start_idx)
+    for idx, e in enumerate(test_engines):
+        end_idx = start_idx + test_eng_max_cycles[idx]
+        print(start_idx, end_idx, test_eng_max_cycles[idx], end_idx-start_idx)
         fig, ax = plt.subplots(figsize=(15,15) )
-        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
-        ax.plot(list(range(train_eng_max_cycles[idx], 0, -1)) , y[start_idx : end_idx] , '.b' , label='actual')
+        ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , y_hat[start_idx : end_idx], '.r', label='predicted')
+        ax.plot(list(range(test_eng_max_cycles[idx], 0, -1)) , y[start_idx : end_idx] , '.b' , label='actual')
         plt.title('Engine #: ' + str(e))
         plt.xlabel('Cycles to Fail')
         plt.ylabel( 'Cycles Used')
-        plt.axvline(stats.describe(train_eng_max_cycles)[1][0], color='r', label='min' )
-        plt.axvline(stats.describe(train_eng_max_cycles)[2], color='g' , label='avg' )
-        plt.axvline(stats.describe(train_eng_max_cycles)[1][1], color='b' , label='max' )
+        plt.xlim( 380, 0)
+        plt.axvline(stats.describe(test_eng_max_cycles)[1][0], color='r', label='min' )
+        plt.axvline(stats.describe(test_eng_max_cycles)[2], color='g' , label='avg' )
+        plt.axvline(stats.describe(test_eng_max_cycles)[1][1], color='b' , label='max' )
         
         ax.legend()
         start_idx = end_idx 
@@ -735,7 +713,7 @@ len(y_hat)
 len(train_features)
 train_features
 len(df_new_train)
-
+len(df_new_test)
 ##########################    Scoreing Section   ###############
 
 
@@ -873,11 +851,33 @@ if make_plots == True:
 df_new_train.head()
 df_new_train.shape
 
+########################   Export Model  as a pickle   ########################
+
+import pickle
+
+
+
+s = pickle.dumps(model)
+clf2 = pickle.loads(s)
+
+# # clf2.predict(X[0:1])
+# array([0])
+# y[0]
+
+
+
+from joblib import dump, load
+dump(model, 'knot_spline.joblib') 
+
+pickle.dump(model, open("model.pkl","wb"))
+
+###############################################################
+
 
 #######################################################################3
 ########################################################################
 ########################################################################
-###########################     Out      ###############################
+##############    Output model as text    ###############################
 ##########################################################################
 
 # export_linear_model_to_txt( 'firsttimeoutofthegate' )
@@ -899,7 +899,7 @@ def export_linear_model_to_txt( file_name ):
     print(out)
 
 
-export_linear_model_to_txt( 'firsttimeoutofthegate' )
+# export_linear_model_to_txt( 'firsttimeoutofthegate' )
 
 
 #############################  Golden Ticket  #####################################
