@@ -853,23 +853,23 @@ df_new_train.shape
 
 ########################   Export Model  as a pickle   ########################
 
-import pickle
+# import pickle
 
 
 
-s = pickle.dumps(model)
-clf2 = pickle.loads(s)
+# s = pickle.dumps(model)
+# clf2 = pickle.loads(s)
 
-# # clf2.predict(X[0:1])
-# array([0])
-# y[0]
+# # # clf2.predict(X[0:1])
+# # array([0])
+# # y[0]
 
 
 
-from joblib import dump, load
-dump(model, 'knot_spline.joblib') 
+# from joblib import dump, load
+# dump(model, 'knot_spline.joblib') 
 
-pickle.dump(model, open("model.pkl","wb"))
+# pickle.dump(model, open("model.pkl","wb"))
 
 ###############################################################
 
@@ -894,13 +894,13 @@ def export_linear_model_to_txt( file_name ):
     out = []
     for fe, co in zip(feat, coef): 
     # print(fe, co)
-        out.append([fe , co ])
+        out.append([str(co) + "   " +  str(fe) ])
     sys.stdout = open(file_name+'.txt', 'w')
     print(out)
     print(model.intercept_)
 
 
-export_linear_model_to_txt( 'firsttimeoutofthegate' )
+export_linear_model_to_txt( 'removedafewknots' )
 
 
 #############################  Golden Ticket  #####################################
