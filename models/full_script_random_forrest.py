@@ -117,8 +117,8 @@ training_set = False
 make_plots = False
 cols_to_use = small_features_list
 df = df1          #<----- #This is the dataframe to use for the model
-target_variable = 'above_mean_life'  #   or 'y_failure'
-n = 30   # <---- set the number of initial cycles to check
+target_variable = 'lower_third_life'  #   or 'y_failure'
+n = 50   # <---- set the number of initial cycles to check
                 # for long vs short life. 
 
 ##########################################################
@@ -266,7 +266,8 @@ if training_set == False:
     df = df_new_test[train_features]
 
 
-
+len(y)
+len(df)
 
 # ### Show the max number of cycles for each unit in all of the sets. ######### 
 # all_eng_max_cycles = []
@@ -301,6 +302,7 @@ if training_set == True:
 if training_set == False:
     df = first_n_observations(df_new_test,n)
     y = df[target_variable]
+
 
 len(df)
 len(y)
@@ -339,12 +341,12 @@ cols = ['time_cycles', 't2_Inlet',
 
 
 
-#####        fit model and use to predict probbilities        #####
+#####        fit model and use to predict probabilities        #####
 
 # Parameter Search                                     
-
-# Train and fit model 
-# 
+#  
+#
+  
 if training_set == True:                                                  
     rf = RandomForestClassifier(n_estimators=1000, 
     max_features='auto', 
@@ -366,13 +368,6 @@ if training_set == False:
 len(y_hat)
 len(y)
 
-
-####################################################
-coefs = model.coef_.reshape(-1,1)
-plt.plot(cols, coefs)
-plt.xticks(cols, cols, rotation='vertical')
-plt.show()
-#####################################################
 
 
 
