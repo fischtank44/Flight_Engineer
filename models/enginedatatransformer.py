@@ -87,3 +87,6 @@ def transform_dataframes_add_ys(data_list= [ ] , *args ):
                 for c in range(cycles):
                     upper_third_list.append( 0 )
         df['upper_third_life'] = upper_third_list
+        # print("Lower third: " + str(lower_third))
+        # print("Middle third: " + str(middle_third))
+        # print("Upper third above: " + str(middle_third))

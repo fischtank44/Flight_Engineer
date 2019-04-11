@@ -98,9 +98,10 @@ data_frames_to_transform = [df1, df2, df3 , df4]
 transform_dataframes_add_ys(data_frames_to_transform)
 # training_set = True
 make_plots = False
+cols_to_use = small_features_list
 df = df1          #<----- #This is the raw dataframe to use for the model
-target_variable = 'above_mean_life'  #   or 'y_failure'
-n = 130   # <---- set the number of initial cycles to check
+target_variable = 'lower_third_life'  #   or 'y_failure'
+n = 75   # <---- set the number of initial cycles to check
 
 
 ##########################################################
@@ -226,10 +227,7 @@ ytest = df_new_test[target_variable]
 
 
 def first_n_observations (  df , n):
-    '''
-    change this to be a window in the middle of the dataset
-    '''
-    num_observations = range(n, n +21 )
+    num_observations = range(1, n +1 )
     train_idx = df['time_cycles'].apply(lambda x: x in num_observations)
     train_list = list(train_idx)
     return df.iloc[train_list].copy()
@@ -274,9 +272,12 @@ cols = ['time_cycles', 't2_Inlet',
 
 #####        fit model and use to predict probabilities        #####
 
+# Parameter Search                                     
+#  
+#
 if training_set == True:                                                    
-    for num in range(5,6):
-        for dep in range(12,13): 
+    for num in range(1,5):
+        for dep in range(8,13, 4): 
             rf = RandomForestClassifier(n_estimators=2000, 
             max_features='auto', 
             random_state=137 , 
@@ -292,10 +293,7 @@ if training_set == True:
             print(f"accuracy = {rf.score(Xtest, ytest)}")
 
 
-plt.plot(range(0, len(ytest)), rf.predict_proba(Xtest) [:, 1], '-b', label= 'prob')
-plt.plot(range(0, len(ytest)), ytest, 'g', label= 'actual')
-plt.legend()
-plt.show()
+rf.predict_proba(Xtest) #[:, 1]
 
 ########################################################################################
 ########################################################################################
@@ -303,67 +301,58 @@ plt.show()
 ########################################################################################
                 ##### Try Gradiant Boost  ########
 
-for num in range(30,81, 5):
-    gdbc = GradientBoostingClassifier(learning_rate=0.01,
-                                  n_estimators=num,
-                                  random_state=137,
-                                max_depth = 3 )
-    gdbc.fit(Xtrain, ytrain)
-    gdbc_test = []
-    for i in gdbc.staged_predict(Xtest):
-        gdbc_test.append(np.mean((sum( (ytest - i)**2))))
-    print(f"The min value for gdbc was {min(gdbc_test)} and the num estimators was {num}.")
- 
 
 
 
-
-# gdbc2 = GradientBoostingClassifier(learning_rate=0.01,
-#                                   n_estimators=1000,
-#                                   random_state=137,
-#                                 max_depth = 100 )
-
-
+gdbr = GradientBoostingRegressor(learning_rate=0.01,
+                                  loss='ls',
+                                  n_estimators=1000,
+                                  random_state=1,
+                                max_depth =3 )
 
 
-# gdbc2.fit(Xtrain, ytrain)
+gdbr10 = GradientBoostingRegressor(learning_rate=.01,
+                                  loss='ls',
+                                  n_estimators= 1000,
+                                  random_state=1,
+                                    max_depth = 10)
 
-gdbc_test = []
+gdbr100= GradientBoostingRegressor(learning_rate=.01,
+                                  loss='ls',
+                                  n_estimators= 1000,
+                                  random_state=1,
+                                    max_depth = 100)
 
-for i in gdbc.staged_predict(Xtest):
-    gdbc_test.append(np.mean((sum( (ytest - i)**2))))
 
-   
+gdbr.fit(Xtrain, ytrain)
+gdbr10.fit(Xtrain, ytrain)
+gdbr100.fit(Xtrain, ytrain)
 
-gdbc_test2 = []
 
-for i in gdbc2.staged_predict(Xtest):
-    gdbc_test2.append(np.mean((sum( (ytest - i)**2))))
+
+scores_test = []
+scores_test_10 = []
+scores_test_100 = []
+
+
+for i in gdbr.staged_predict(Xtest):
+    scores_test.append(np.mean((sum( (ytest - i)**2))))
+            
+for i in gdbr10.staged_predict(Xtest):
+    scores_test_10.append(np.mean((sum( (ytest - i)**2))))
+     
+for i in gdbr100.staged_predict(Xtest):
+    scores_test_100.append(np.mean((sum( (ytest - i)**2))))
 
 
 
 fig, axs = plt.subplots(1, 1, figsize=(15, 12))
-plt.plot(range(0, len(ytest)), gdbc.predict_proba(Xtest) [:, 1], '-b', label= 'prob')
-plt.plot(range(0, len(ytest)), ytest, 'g', label= 'actual')
-plt.legend()
+plt.plot(range(len(scores_ada)), scores_ada, color = 'purple')
+plt.plot(range(len(scores_test_10)), scores_test_10, color = 'red')
+plt.plot(range(len(scores_test_100)), scores_test_100, color = 'b')
+plt.plot(range(len(scores_test)), scores_test, color = 'green')
+# axs.set_ylim(0,800)
 plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

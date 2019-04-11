@@ -900,7 +900,7 @@ def export_linear_model_to_txt( file_name ):
     print(model.intercept_)
 
 
-export_linear_model_to_txt( 'removedafewknots' )
+export_linear_model_to_txt( 'removedafewknots-2' )
 
 
 #############################  Golden Ticket  #####################################
