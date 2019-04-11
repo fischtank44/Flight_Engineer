@@ -900,7 +900,7 @@ def export_linear_model_to_txt( file_name ):
     print(model.intercept_)
 
 
-# export_linear_model_to_txt( 'firsttimeoutofthegate' )
+export_linear_model_to_txt( 'firsttimeoutofthegate' )
 
 
 #############################  Golden Ticket  #####################################
