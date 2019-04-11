@@ -97,7 +97,7 @@ small_features_list = [
 #######      List of vaiables and features for model    #######
 
 
-training_set = False
+training_set = True
 make_plots = False
 data_frames_to_transform = [df1, df2, df3 , df4]
 transform_dataframes_add_ys(data_frames_to_transform)
@@ -847,7 +847,7 @@ if make_plots == True:
 # plt.show()
 
 
-
+model.intercept_
 df_new_train.head()
 df_new_train.shape
 
@@ -897,6 +897,7 @@ def export_linear_model_to_txt( file_name ):
         out.append([fe , co ])
     sys.stdout = open(file_name+'.txt', 'w')
     print(out)
+    print(model.intercept_)
 
 
 # export_linear_model_to_txt( 'firsttimeoutofthegate' )

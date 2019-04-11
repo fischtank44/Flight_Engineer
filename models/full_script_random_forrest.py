@@ -118,7 +118,7 @@ make_plots = False
 cols_to_use = small_features_list
 df = df1          #<----- #This is the dataframe to use for the model
 target_variable = 'above_mean_life'  #   or 'y_failure'
-n = 75   # <---- set the number of initial cycles to check
+n = 30   # <---- set the number of initial cycles to check
                 # for long vs short life. 
 
 ##########################################################
@@ -177,7 +177,8 @@ if make_plots==True:
 
 
 # test_engines = list(np.random.choice(range(1,101), 20, replace= False))
-test_engines = [4, 18, 19, 21, 28, 33, 42, 45, 46, 50, 61, 73, 74, 78, 82, 83, 84, 86, 92, 94]
+test_engines = [4, 18, 19, 21, 28, 33, 42, 45, 46, 50, 61, 73, 74, 78, 82, 83,
+ 84, 86, 92, 94]
 
 
 train_engines = []
@@ -256,13 +257,14 @@ stats.describe(test_eng_max_cycles)
 # this is the training set split  #######
 if training_set == True:
     y = df_new_train[target_variable]
-    features = df_new_train[train_features]
+    df = df_new_train[train_features]
 
 
 ### This is the test set split #######
 if training_set == False:
     y = df_new_test[target_variable]
-    features = df_new_test[train_features]
+    df = df_new_test[train_features]
+
 
 
 
@@ -278,13 +280,13 @@ if training_set == False:
 
 
 #########   Limit the size of the dataframe to first n observations   ##############################
+
+
 def first_n_observations (  df , n):
     num_observations = range(1, n +1 )
     train_idx = df['time_cycles'].apply(lambda x: x in num_observations)
     train_list = list(train_idx)
     return df.iloc[train_list].copy()
-
-
 
 
 ######################################################################################
@@ -302,7 +304,7 @@ if training_set == False:
 
 len(df)
 len(y)
-len(features)
+
 
 
 ##################################################################################################
@@ -343,31 +345,26 @@ cols = ['time_cycles', 't2_Inlet',
 
 # Train and fit model 
 # 
-if training_set ==True:                                                  
-    rf = RandomForestClassifier(n_estimators=1000,
-                           max_features='auto',
-                           random_state=137)
-
-
-if training_set == True:
+if training_set == True:                                                  
+    rf = RandomForestClassifier(n_estimators=1000, 
+    max_features='auto', 
+    random_state=137 , 
+    n_jobs=-1)
     rf.fit(df[cols], y)
+    y_hat = rf.predict(df[cols])
+    print(f"log loss = {log_loss(y, rf.predict_proba(df[cols]))}")
+    print(f"accuracy = {rf.score(df[cols], y)}")
 
 
+if training_set == False:
+    y_hat = rf.predict(df[cols])
+    y = df['above_mean_life']
+    print(f"log loss = {log_loss(y, rf.predict_proba(df[cols]))}")
+    print(f"accuracy = {rf.score(df[cols], y)}")
 
 
-# Test Prediction
-pred = rf.predict(df[cols])
-
-print(f"log loss = {log_loss(y, rf.predict_proba(df[cols])[:, 1])}")
-print(f"accuracy = {rf.score(df[cols], y)}")
-
-
-len(pred)
-len(df[cols])
+len(y_hat)
 len(y)
-
-plt.plot(pred, y)
-plt.show()
 
 
 ####################################################
@@ -474,19 +471,6 @@ plt.show()
 
 
 ####################################################################
-
-
-###    Fit Test Data to the model   #######
-if training_set == False:
-    model = LogisticRegression(fit_intercept=True)
-    model.fit(features.values, y ) #np.log(y)) # <---- note: the np.log transformation
-####  Make predictions against the test set
-    y_hat = model.predict(features.values)
-    y_hat = y_hat     # np.exp(y_hat)                ## <----- note: the exp to transform back
-
-len(y_hat)
-len(y)
-len(features)
 
 
 
