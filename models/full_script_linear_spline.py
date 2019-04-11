@@ -391,7 +391,7 @@ t30_fit = Pipeline([
 
 t50_fit = Pipeline([
     ('t50_lpt', ColumnSelector(name='t50_lpt')),
-    ('t50_lpt_spline', LinearSpline(knots=[1385, 1390, 1400, 1401, 1411, 1415, 1421, 1430, 1440]))
+    ('t50_lpt_spline', LinearSpline(knots=[1390, 1400, 1401, 1411, 1415, 1421, 1430, 1440]))
 ])
 
 p30_fit = Pipeline([
@@ -401,7 +401,7 @@ p30_fit = Pipeline([
 
 nf_fan_fit = Pipeline([
     ('nf_fan_speed', ColumnSelector(name='nf_fan_speed')),
-    ('nf_fan_speed_spline', LinearSpline(knots=[2387.9, 2388, 2388.1, 2388.15, 2388.2, 2388.3]))
+    ('nf_fan_speed_spline', LinearSpline(knots=[2388, 2388.1, 2388.15, 2388.2, 2388.3]))
 ])
 
 nc_core_fit = Pipeline([
@@ -421,7 +421,7 @@ phi_fp_fit = Pipeline([
 
 nrf_cor_fit = Pipeline([
     ('nrf_cor_fan_sp', ColumnSelector(name='nrf_cor_fan_sp')),
-    ('nrf_cor_fan_sp_spline', LinearSpline(knots=[2387.9, 2388, 2388.6, 2388.2 , 2388.3, 2388.4]))
+    ('nrf_cor_fan_sp_spline', LinearSpline(knots=[2388, 2388.6, 2388.2 , 2388.3, 2388.4]))
 ])
 
 nrc_core_fit = Pipeline([
