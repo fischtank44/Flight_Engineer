@@ -282,6 +282,37 @@ stats.describe(train_eng_max_cycles)
 
 
 
+
+#########################################
+##########################################
+############    Histogram of taining data #########
+
+# Set up the plot
+ax = plt.subplot()
+
+# Draw the plot
+ax.hist(train_eng_max_cycles, bins = int(180/15),
+            color = 'blue', edgecolor = 'black')
+
+# Title and labels
+ax.set_title('Failure Distribution', size = 15)
+ax.set_xlabel('Cycles', size = 8)
+ax.set_ylabel('Count of Engines', size= 8)
+plt.xlim([0,380])
+plt.ylim([0, 20])
+plt.vlines(stats.describe(train_eng_max_cycles)[1][0], 0, 19, label="Min: %.0f" % stats.describe(train_eng_max_cycles)[1][0], colors='r')
+plt.vlines(stats.describe(train_eng_max_cycles)[2], 0, 19, label="Mean: %.0f" % stats.describe(train_eng_max_cycles)[2], colors='yellow') 
+plt.vlines(stats.describe(train_eng_max_cycles)[1][1], 0, 19, label="Max: %.0f" % stats.describe(train_eng_max_cycles)[1][1], colors='g') 
+plt.legend()
+
+
+#plt.tight_layout()
+plt.show()
+
+######################################################
+########################################################
+
+
 #######  the max number of cycles for the test set of engines  ########
 test_eng_max_cycles = []
 for e in test_engines:
@@ -547,17 +578,27 @@ len(features)
 
 ####  Plot predictions from data against the actual values ########
 if make_plots==True:
-    x = list(range( 1,360))
-    y = x
-    plt.scatter(y_hat, y, alpha = 0.1, color='blue')
-    plt.plot(x, y, '-r', label='y=2x+1')
-    plt.title('Pipline Predictions with log(y)')
-    plt.xlabel('$\hat {y}$ from training set')
-    plt.ylabel( 'y actuals from training set')
-    plt.xlim(360,1)
+    x = list(range(1,361)) 
+    plt.scatter(y, y_hat, alpha = 0.1, color='red')
+    plt.plot(x, x, '-b', label='y=x+1')
+    plt.title('Cycles to Fail Estimates: Training Data')
+    plt.xlabel('Number of Cycles' )
+    plt.ylabel( '$\hat {y}$\'s')
+    plt.xlim(370,1)
     plt.show()
 ###
 
+####  Plot predictions from data against the actual values ########
+if make_plots==True and training_set == False:
+    x = list(range(1,361)) 
+    plt.scatter(y, y_hat, alpha = 0.1, color='red')
+    plt.plot(x, x, '-b', label='y=x+1')
+    plt.title('Cycles to Fail Estimates: Test Data')
+    plt.xlabel('Number of Cycles' )
+    plt.ylabel( '$\hat {y}$\'s')
+    plt.xlim(370,1)
+    plt.show()
+###
 
 
 #### Second plot that will show the difference from actuals vs pred for the pipeline model   ###### 
