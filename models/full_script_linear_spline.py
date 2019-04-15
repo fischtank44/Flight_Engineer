@@ -247,6 +247,7 @@ test_engines
 
 
 
+
 ############  Find index numbers for the training and test sets    ###########   
 test_idx = df['unit'].apply(lambda x: x in test_engines)
 train_idx = df['unit'].apply(lambda x: x in train_engines)
@@ -288,27 +289,21 @@ stats.describe(train_eng_max_cycles)
 ##########################################
 ############    Histogram of taining data #########
 
-# Set up the plot
-ax = plt.subplot()
-
-# Draw the plot
-ax.hist(train_eng_max_cycles, bins = int(180/15),
-            color = 'blue', edgecolor = 'black')
-
-# Title and labels
-ax.set_title('Failure Distribution', size = 15)
-ax.set_xlabel('Cycles', size = 8)
-ax.set_ylabel('Count of Engines', size= 8)
-plt.xlim([0,380])
-plt.ylim([0, 20])
-plt.vlines(stats.describe(train_eng_max_cycles)[1][0], 0, 19, label="Min: %.0f" % stats.describe(train_eng_max_cycles)[1][0], colors='r')
-plt.vlines(stats.describe(train_eng_max_cycles)[2], 0, 19, label="Mean: %.0f" % stats.describe(train_eng_max_cycles)[2], colors='yellow') 
-plt.vlines(stats.describe(train_eng_max_cycles)[1][1], 0, 19, label="Max: %.0f" % stats.describe(train_eng_max_cycles)[1][1], colors='g') 
-plt.legend()
-
-
-#plt.tight_layout()
-plt.show()
+    # Set up the plot
+if make_plots == True:
+    ax = plt.subplot()
+    ax.hist(train_eng_max_cycles, bins = int(180/15),
+                color = 'blue', edgecolor = 'black')
+    ax.set_title('Failure Distribution', size = 15)
+    ax.set_xlabel('Cycles', size = 8)
+    ax.set_ylabel('Count of Engines', size= 8)
+    plt.xlim([0,380])
+    plt.ylim([0, 20])
+    plt.vlines(stats.describe(train_eng_max_cycles)[1][0], 0, 19, label="Min: %.0f" % stats.describe(train_eng_max_cycles)[1][0], colors='r')
+    plt.vlines(stats.describe(train_eng_max_cycles)[2], 0, 19, label="Mean: %.0f" % stats.describe(train_eng_max_cycles)[2], colors='yellow') 
+    plt.vlines(stats.describe(train_eng_max_cycles)[1][1], 0, 19, label="Max: %.0f" % stats.describe(train_eng_max_cycles)[1][1], colors='g') 
+    plt.legend()
+    plt.show()
 
 ######################################################
 ########################################################
