@@ -99,7 +99,7 @@ transform_dataframes_add_ys(data_frames_to_transform)
 make_plots = False
 df = df1          #<----- #This is the raw dataframe to use for the model
 target_variable = 'above_mean_life'  #   or 'y_failure'
-n = 130   # <---- set the number of initial cycles to check
+n = 120   # <---- set the number of initial cycles to check
 
 
 ##########################################################
@@ -108,7 +108,7 @@ n = 130   # <---- set the number of initial cycles to check
 #### add column to the end for logistic predictive model   ######
 #### 
 
-
+df.columns
 #####  End of data import file #######
 
 
@@ -136,29 +136,15 @@ train_features = [
 
 
 
-######    the training features has the columns to train to ### 
-#######    the columns time_cycles and time_to_fail have been removed ##
-
-
-#####   adjust the data frame to choose 20 % of the engines by unmber and 
-#####   train to a sample of 80% by number and 20% saved for test data.
-
-
 # test_engines = list(np.random.choice(range(1,101), 20, replace= False))
-test_engines = [4, 18, 19, 21, 28, 33, 42, 45, 46, 50, 61, 73, 74, 78, 82, 83,
- 84, 86, 92, 94]
+test_engines = [4, 18, 19, 21, 28, 33, 42, 45, 46, 50, 61, 73, 74, 78, 82, 83, 84, 86, 92, 94]
 
 
-train_engines = []
-for num in range(1,101):
-    if num not in test_engines:
-        train_engines.append(num)
+train_engines = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 22, 23, 24, 25, 26, 
+    27, 29, 30, 31, 32, 34, 35, 36, 37, 38, 39, 40, 41, 43, 44, 47, 48, 49, 51, 52, 53, 54, 55, 
+    56, 57, 58, 59, 60, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 75, 76, 77, 79, 80, 81, 85, 
+    87, 88, 89, 90, 91, 93, 95, 96, 97, 98, 99, 100]
 
-
-# train_engines = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 20, 22, 23, 24, 25, 26, 
-#     27, 29, 30, 31, 32, 34, 35, 36, 37, 38, 39, 40, 41, 43, 44, 47, 48, 49, 51, 52, 53, 54, 55, 
-#     56, 57, 58, 59, 60, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 75, 76, 77, 79, 80, 81, 85, 
-#     87, 88, 89, 90, 91, 93, 95, 96, 97, 98, 99, 100]
 
 ############  Find index numbers for the training and test sets    ###########   
 test_idx = df['unit'].apply(lambda x: x in test_engines)
@@ -273,26 +259,27 @@ cols = ['time_cycles', 't2_Inlet',
 
 #####        fit model and use to predict probabilities        #####
 
-if training_set == True:                                                    
-    for num in range(5,6):
-        for dep in range(12,13): 
-            rf = RandomForestClassifier(n_estimators=2000, 
-            max_features='auto', 
-            random_state=137 , 
-            n_jobs=-1,
-            max_depth= dep,
-            min_samples_leaf = num,
-            verbose= 0)
-            rf.fit(Xtrain, ytrain)
-            y_hat = rf.predict(Xtest)
-            print(f"minimum leaf samples = {num}")
-            print(f"max tree depth = {dep}")
-            print(f"log loss = {log_loss(ytest, rf.predict_proba(Xtest)[:, 1])}")
-            print(f"accuracy = {rf.score(Xtest, ytest)}")
+                                                   
+for num in range(5,6):
+    for dep in range(12,13): 
+        rf = RandomForestClassifier(n_estimators=2000, 
+        max_features='auto', 
+        random_state=137 , 
+        n_jobs=-1,
+        max_depth= dep,
+        min_samples_leaf = num,
+        verbose= 0)
+        rf.fit(Xtrain, ytrain)
+        y_hat = rf.predict(Xtest)
+        print(f"minimum leaf samples = {num}")
+        print(f"max tree depth = {dep}")
+        print(f"log loss = {log_loss(ytest, rf.predict_proba(Xtest)[:, 1])}")
+        print(f"accuracy = {rf.score(Xtest, ytest)}")
 
 
 plt.plot(range(0, len(ytest)), rf.predict_proba(Xtest) [:, 1], '-b', label= 'prob')
 plt.plot(range(0, len(ytest)), ytest, 'g', label= 'actual')
+plt.title(f"Random Forest Pred: {target_variable}: First {n} Cycles\n Accuracy = {rf.score(Xtest, ytest):.4f} Log Loss = {log_loss(ytest, rf.predict_proba(Xtest)[:, 1]):.4f}")
 plt.legend()
 plt.show()
 
