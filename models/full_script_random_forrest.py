@@ -54,7 +54,6 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier
 from sklearn.ensemble import AdaBoostRegressor, AdaBoostClassifier
-from sklearn.datasets import load_boston
 from sklearn.model_selection import GridSearchCV
 
 

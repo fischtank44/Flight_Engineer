@@ -97,7 +97,7 @@ small_features_list = [
 #######      List of vaiables and features for model    #######
 
 
-training_set = True
+training_set = False
 make_plots = False
 data_frames_to_transform = [df1, df2, df3 , df4]
 transform_dataframes_add_ys(data_frames_to_transform)
@@ -127,11 +127,19 @@ if make_plots==True:
 #
 
 
+if make_plots==True:
+    for name in train_features:
+        df.plot.scatter( target_variable, name, alpha = .3)
+        plt.show()
+#
+
+
 
 ######     Several features appear to not be predictive  ######
 #####     Scatter matrix using time cycles            ##### 
 if make_plots==True:
     scatter_matrix = pd.scatter_matrix(df[cols_to_use], alpha=0.2, figsize=(20, 20), diagonal='kde')
+
 
 if make_plots==True:
     for ax in scatter_matrix.ravel():
@@ -355,6 +363,7 @@ if make_plots==True:
                             df[target_variable],
                             df[name].values.reshape(-1, 1),
                             bootstrap=100)
+        ax.set_xlim([370,0])
         ax.set_title(name, fontsize=7)
     plt.show()
 
@@ -742,7 +751,7 @@ log_knot_model
 # y
 # y_hat
 
-r2_for_last_n_cycles(y_hat , y, last_n=150)
+r2_for_last_n_cycles(y_hat , y, last_n=550)
 r2_for_last_n_cycles(y_hat , y, last_n=100)
 r2_for_last_n_cycles(y_hat , y, last_n=75)
 r2_for_last_n_cycles(y_hat , y, last_n=50)

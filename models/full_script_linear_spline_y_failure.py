@@ -293,21 +293,21 @@ test_eng_max_cycles
 ###########             Train to Cycles to Fail                ######################
 ###########@@@@@@@@    Toggle commments to change target   @@@@@########################
 
-# ## This will make the train test split for this model ####
-# ytrain = df_new_train['cycles_to_fail']
-# X_features = df_new_train[train_features]
-# ytest = df_new_test['cycles_to_fail']
-# X_test_feaures = df_new_test[train_features]
-
-
-
-
-###########                Train to y_failure (0-1)                ######################
 ## This will make the train test split for this model ####
-ytrain = df_new_train['y_failure']
+ytrain = df_new_train['cycles_to_fail']
 X_features = df_new_train[train_features]
-ytest = df_new_test['y_failure']
-X_test_features = df_new_test[train_features]
+ytest = df_new_test['cycles_to_fail']
+X_test_feaures = df_new_test[train_features]
+
+
+
+
+# ###########                Train to y_failure (0-1)                ######################
+# ## This will make the train test split for this model ####
+# ytrain = df_new_train['y_failure']
+# X_features = df_new_train[train_features]
+# ytest = df_new_test['y_failure']
+# X_test_features = df_new_test[train_features]
 
 
 
@@ -351,34 +351,37 @@ X_test_features = df_new_test[train_features]
 #
 #
 #
+
 # #####   Plot the data from the first model and evaluate the residuals
 
-# plt.scatter(L_y_predicted, ytrain, alpha = 0.1)
-# plt.xlabel('y hat from training set')
-# plt.ylabel( 'y values from training set')
-# plt.show()
-# ###
+plt.scatter(L_y_predicted, ytrain, alpha = 0.1)
+plt.xlabel('y hat from training set')
+plt.ylabel( 'y values from training set')
+plt.show()
+###
 
 
 
 
 
 
-#### Second plot that will show the difference from actuals vs pred
-# fig = plt.figure()
-# fig, ax = plt.subplots(figsize=(15,15) )
-# ax.plot(list(range(1, len(L_y_predicted) + 1)) , L_y_predicted, '.r', label='predicted')
-# ax.plot(list(range(1, len(ytrain) + 1 )) , ytrain, '.b' , label='actual')
-# plt.xlabel('Index of Value')
-# plt.ylabel( 'Cycles to Fail')
-# ax.legend()
-# plt.show()
+### Second plot that will show the difference from actuals vs pred
+fig = plt.figure()
+fig, ax = plt.subplots(figsize=(15,15) )
+ax.plot(list(range(1, len(L_y_predicted) + 1)) , L_y_predicted, '.r', label='predicted')
+ax.plot(list(range(1, len(ytrain) + 1 )) , ytrain, '.b' , label='actual')
+plt.xlabel('Index of Value')
+plt.ylabel( 'Cycles to Fail')
+ax.legend()
+plt.show()
 
-### First score from basic linear regression model   ####
-# base_score = r2(ytrain, L_y_predicted)
-# base_score
-# linear_model_80_engine = base_score
-# linear_model_80_engine
+## First score from basic linear regression model   ####
+base_score = r2(ytrain, L_y_predicted)
+base_score
+linear_model_80_engine = base_score
+linear_model_80_engine
+
+
 
 #####  score of model no tuning trained to time cycles to go
 ##  0.5302416225409862
@@ -422,19 +425,21 @@ for col in train_features:
     plt.ylabel( 'Cycles to Fail')
     plt.show()
 
-#### Begining of the linear spline transformation parameters    #######
-# linear_spline_transformer = LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300])
+### Begining of the linear spline transformation parameters    #######
+linear_spline_transformer = LinearSpline(knots=[10, 35, 50, 80, 130, 150, 200, 250, 300])
 
-# linear_spline_transformer.transform(df1['cycles_to_fail']).head()
+linear_spline_transformer.transform(df1['cycles_to_fail']).head()
 
-# cement_selector = ColumnSelector(name='cycles_to_fail')
-# cement_column = cement_selector.transform('cycles_to_fail')
-# linear_spline_transformer.transform(cement_column).head()
+cement_selector = ColumnSelector(name='cycles_to_fail')
+cement_column = cement_selector.transform('cycles_to_fail')
+linear_spline_transformer.transform(cement_column).head()
+
+
 
 train_features
 
-train_features = 
-['time_cycles', 
+train_features = [
+    'time_cycles', 
 't24_lpc', 
 't30_hpc', 
 't50_lpt', 
@@ -561,26 +566,25 @@ feature_pipeline = FeatureUnion([
 #### Build out the new dataframes with each knot   
 #### Must use the 80 engine traing set !!!!!!!   
 
-feature_pipeline.fit(df_new_test)
-features = feature_pipeline.transform(df_new_test)
+# feature_pipeline.fit(df_new_train)
+# features = feature_pipeline.transform(df_new_test)
 
-
-#####   
 
 
 ###    Fit model to the pipeline   #######
 
 ytest
-X_test_features
+features
 
 model = LinearRegression(fit_intercept=True)
-model.fit(X_test_feaures.values, ytest)   #np.log(ytrain) # <---- note: the np.log transformation
+model.fit(df_new_train[train_features], ytrain)   #np.log(ytrain) # <---- note: the np.log transformation
 
 
 
 
 len(ytest)
-len(X_test_features)
+len(features)
+len(y_hat)
 
 #### View the coefficients
 display_coef(model, features.columns)
@@ -588,27 +592,68 @@ display_coef(model, features.columns)
 plt.plot(range(0,len(model.coef_)), model.coef_)
 plt.show()
 
-
+ytest
+y_hat
 
 ####  Make predictions against the training set
-y_hat = model.predict(X_test_features.values)
+y_hat = model.predict(df_new_test[train_features])
 y_hat = y_hat   # np.exp(y_hat)                ## <----- note: the exp to transform back
 
 
+
+'''
+polynomeal analysis
+'''
+
+
+import numpy as np
+from scipy.optimize import curve_fit
+
+
+
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn import linear_model
+
+
+poly = PolynomialFeatures(degree=2)
+X_ = poly.fit_transform(df_new_train[train_features])
+predict_ = poly.fit_transform(df_new_train[train_features])
+
+
+predict_ = poly.fit_transform(df_new_test[train_features])
+
+
+clf = linear_model.LinearRegression()
+clf.fit(X_, ytrain)
+
+
+y_hat = clf.predict(predict_)
+len(y_hat)
+len(ytest)
+
+
+'''
+the above is the alternate polynomeal test
+'''
+
+
+
 ####  Plot predictions from data against the actual values ########
-x = list(range(0,3))
+x = list(range(0,400))
 y = x
 plt.scatter(y_hat, ytest, alpha = 0.1, color='blue')
 plt.plot(x, y, '-r', label='y=2x+1')
-plt.title('Pipline Predictions (Useful Life)')
-plt.xlabel('y hat from training set')
-plt.ylabel( 'y actuals from training set')
-plt.ylim(-0.1, 1.2)
-plt.xlim(1.1, -0.1)
+plt.title('Polynomial Regression: Cycles to Fail')
+plt.xlabel('$\hat {y}$ from test set')
+plt.ylabel( '${y}$ from test set')
+plt.ylim(0, 360)
+plt.xlim(370, -0.1)
 plt.show()
 ###
 
 
+clf.coef_
+predict_.shape
 
 
 
@@ -770,16 +815,17 @@ log_knot_model
 # 0.7272227017732488
 #log_knot_model
 # 0.7273228097635444
-
+# R- Squared for polynomeal regression of test data is:
+#   'The r-squared for the last 500 cycles is: 0.6554345266551393'
 
 
 
 ##### R-squared for the last n number of observations  #####
 #
-ytrain
+ytest
 y_hat
 
-r2_for_last_n_cycles(y_hat , ytrain, last_n=150)
+r2_for_last_n_cycles(y_hat , ytest, last_n=500)
 r2_for_last_n_cycles(y_hat , ytrain, last_n=100)
 r2_for_last_n_cycles(y_hat , ytrain, last_n=75)
 r2_for_last_n_cycles(y_hat , ytrain, last_n=50)
