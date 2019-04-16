@@ -1,0 +1,26 @@
+ Xtrain.columns
+Index(['time_cycles', 't24_lpc', 't30_hpc', 't50_lpt', 'p30_hpc',
+       'nf_fan_speed', 'nc_core_speed', 'ps_30_sta_press', 'phi_fp_ps30',
+       'nrf_cor_fan_sp', 'nrc_core_sp', 'bpr_bypass_rat', 'htbleed_enthalpy',
+       'w31_hpt_cool_bl', 'w32_lpt_cool_bl'],
+      dtype='object')
+>>> 
+
+1. time_cycles (0.112451)
+2. t24_lpc (0.104012)
+3. t30_hpc (0.091935)
+4. t50_lpt (0.080888)
+5. p30_hpc (0.080377)
+6. nf_fan_speed (0.070404)
+7. nc_core_speed (0.069378)
+8. ps_30_sta_press (0.063780)
+9. phi_fp_ps30 (0.063288)
+10. nrf_cor_fan_sp (0.060841)
+11. nrc_core_sp (0.056937)
+12. bpr_bypass_rat (0.044192)
+13. htbleed_enthalpy (0.039977)
+14. w31_hpt_cool_bl (0.039507)
+15. w32_lpt_cool_bl (0.016632)
+
+
+
