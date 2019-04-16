@@ -99,7 +99,7 @@ transform_dataframes_add_ys(data_frames_to_transform)
 make_plots = False
 df = df1          #<----- #This is the raw dataframe to use for the model
 target_variable = 'above_mean_life'  #   or 'y_failure'
-n = 120   # <---- set the number of initial cycles to check
+n = 110   # <---- set the number of initial cycles to check
 
 
 ##########################################################
@@ -285,6 +285,73 @@ plt.show()
 
 ########################################################################################
 ########################################################################################
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.datasets import make_classification
+from sklearn.ensemble import ExtraTreesClassifier
+
+# Build a classification task using 3 informative features
+# X, y = make_classification(n_samples=1000,
+#                            n_features=10,
+#                            n_informative=3,
+#                            n_redundant=0,
+#                            n_repeated=0,
+#                            n_classes=2,
+#                            random_state=0,
+#                            shuffle=False)
+
+col_names_clean = ['num cycles', 't24 lpc', 't30 hpc', 't50 lpt', 'p30 hpc',
+       'nf fan speed', 'nc core speed', 'ps 30 sta press', 'phi fp ps30',
+       'nrf fan sp', 'nrc core sp', 'bpr bypass', 'ht bleed',
+       'w31 hpt cool bl', 'w32 lpt cool bl'
+       ] 
+
+
+# Build a forest and compute the feature importances
+forest = ExtraTreesClassifier(n_estimators = 10000, 
+        max_features='auto', 
+        random_state=137 , 
+        n_jobs=-1,
+        max_depth= 12,
+        min_samples_leaf = 5,
+        verbose= 0)
+
+forest.fit(Xtrain, ytrain)
+importances = forest.feature_importances_
+std = np.std([tree.feature_importances_ for tree in forest.estimators_],
+             axis=0)
+indices = np.argsort(importances)[::-1]
+
+# Print the feature ranking
+print("Feature ranking:")
+
+for f in range(Xtrain.shape[1]):
+    print("%d. %s (%f)" % (f + 1, Xtrain.columns[f], importances[indices[f]]))
+
+# Plot the feature importances of the forest
+plt.figure( figsize = (15, 15) )
+plt.title("Feature Importance \n Random Forest: 110 Cycles")
+plt.bar(range(Xtrain.shape[1]), importances[indices],
+       color="b", yerr=std[indices], align="center")
+plt.xticks(range(Xtrain.shape[1]), Xtrain.columns[indices], rotation= 90, size = 8)
+plt.xlim([-1, Xtrain.shape[1]])
+plt.show()
+
+y_hat = forest.predict(Xtest)
+print(f"minimum leaf samples = {num}")
+print(f"max tree depth = {dep}")
+print(f"log loss = {log_loss(ytest, rf.predict_proba(Xtest)[:, 1])}")
+print(f"accuracy = {rf.score(Xtest, ytest)}")
+
+
+plt.plot(range(0, len(ytest)), rf.predict_proba(Xtest) [:, 1], '-b', label= 'prob')
+plt.plot(range(0, len(ytest)), ytest, 'g', label= 'actual')
+plt.title(f"Random Forest Pred: {target_variable}: First {n} Cycles\n Accuracy = {rf.score(Xtest, ytest):.4f} Log Loss = {log_loss(ytest, rf.predict_proba(Xtest)[:, 1]):.4f}")
+plt.legend()
+plt.show()
+
 ########################################################################################
 ########################################################################################
                 ##### Try Gradiant Boost  ########
