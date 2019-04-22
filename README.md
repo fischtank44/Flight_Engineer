@@ -26,7 +26,7 @@ The second target variable could be optimized for one of two hybrid values. The 
 
 In either of these two hybrid cases the target for y is derived from the the number of the current cycle and the max number of cycles a specific engine operated to (for example 250 cycles). The target variable in this case would be set to start at:
 
-![alt text](http://www.codecogs.com/gif.latex?1-\frac{1}{250} )
+![alt text](http://www.codecogs.com/gif.latex?\frac{1}{250} )
 
 and it would end at:
 
