@@ -70,3 +70,7 @@ The plots of the first model indicated that the features contained data that was
 This was an indication that a transformation would be necessary. The first attempt was a natural log transformation of the target value (cycles to failure). The log variables started at values as high as 5.8916 (362 life cycles remaining), but all engines continued down to a value of 0 (1 life cycle remaining). The results where significantly improved as shown in this plot:   
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/training_cycles_to_fail.png)
+
+and from the test set:
+
+![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/test_cycles_to_fail.png)
