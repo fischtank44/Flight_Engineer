@@ -62,6 +62,6 @@ The plots of the first model indicated that the features contained data that was
 
 
 ### Linear regression with a log transformed target variable.
-This is an indication that a log transformation would be useful. The first transformation was a log transformation of the y variable. Log variables started as high as 5.8 (350 cycles of life) and continued down to 0 (one life cycle remaining). The results where significantly improved as shown in this graph:   
+This is an indication that a log transformation would be useful. The first transformation was a log transformation of the y variable. Log variables started as high as 5.8 (350 cycles of life) and continued down to 0 (one life cycle remaining). The results where significantly improved as shown in this plot:   
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/training_cycles_to_fail.png)
