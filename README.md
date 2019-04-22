@@ -34,7 +34,11 @@ and it would end at:
 
 Thus, it would count up from nearly 0 to 1. While interpreting this value as a probability of failure would be incorrect, it would behave in a manner that is similar to probability of failure. Values that are estimated to be at or near 1 would indicate that the engine was at or near the point of failure.
 
-The same value can be subtracted from 1 (1 - (1/250) ) and would then decrease from nearly 1 to 0. Thus, it would count down from approximately 100% at the beginning of its life to 0% at the end.
+The same value can be subtracted from 1:
+
+![alt text](http://www.codecogs.com/gif.latex?1-\frac{1}{250} )
+
+and would then decrease from nearly 1 to 0. Thus, it would count down from approximately 100% at the beginning of its life to 0% at the end.
 
 Most importantly, it would allow for the compact form of a knot and spline model to be retained.
 
