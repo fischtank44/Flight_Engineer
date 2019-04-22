@@ -20,10 +20,17 @@ The training dataset was chosen by randomly sampling 80% of the engines that wer
 
 ## Target variable:
 
-Since each engine was run to failure, the first target variable chosen was the exact number of cycles to failure for each engine. The maximum number of cycles that each engine was able to run varied from 192 – 300 cycles. Thus it was possible for one engine to start with 250 life cycles remaining and another to begin its life with only 175 cycles.
+Since each engine was run to failure, the first target variable chosen was the exact number of cycles to failure for each engine. The maximum number of cycles that each engine was able to run varied from 192 – 300 cycles. Thus it was possible for one engine to start with 250 life cycles remaining and another to begin its life with only 175 cycles. By setting the target variable to a countdown to 1 cycle remaining, it was possible to observe the overall trends as each engine experienced degradation as it approached failure.
 
-The second variable was optimized for a logistic model. The value for y was derived from the max number of cycles the engine operated (ex. 250 cycles) and the target variable was set to start at 1/250th (close to 0) of life remaining and end at 250/250 (close to 1). A value for when an engine needs to be removed will be selected based on the results of the cost benefit analysis.
+The second target variable could be optimized for one of two hybrid values. The first could best be described as useful life remaining and the second as amount of useful life used up.
 
+In either of these two hybrid cases the target for y is derived from the the number of the current cycle and the max number of cycles a specific engine operated to (for example 250 cycles). The target variable in this case would be set to start at ( 1/max(engine cycles) or 1/250 ) and it would end at 250/250. Thus, it would count up from nearly 0 to 1. While interpreting this value as a probability of failure would be incorrect, it would behave in a manner that is similar to probability of failure. Values that are estimated to be at or near 1 would indicate that the engine was at or near the point of failure.
+
+The same value can be subtracted from 1 (1 - (1/250) ) and would then decrease from nearly 1 to 0. Thus, it would count down from approximately 100% at the beginning of its life to 0% at the end.
+
+Most importantly, it would allow for the compact form of a knot and spline model to be retained.
+
+![alt text](http://www.codecogs.com/gif.latex?1+sin(x))
 
 ## Models:
 Linear regression with knots and splines.
