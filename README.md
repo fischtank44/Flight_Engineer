@@ -36,7 +36,7 @@ Thus, it would count up from nearly 0 to 1. While interpreting this value as a p
 
 The same value can be subtracted from 1:
 
-![alt text](http://www.codecogs.com/gif.latex?1-\frac{1}{250} )
+![alt text](http://www.codecogs.com/gif.latex?1-\frac{1}{250}=.996 )
 
 and would then decrease from nearly 1 to 0. Thus, it would count down from approximately 100% at the beginning of its life to 0% at the end.
 
