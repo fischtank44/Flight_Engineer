@@ -30,7 +30,7 @@ The same value can be subtracted from 1 (1 - (1/250) ) and would then decrease f
 
 Most importantly, it would allow for the compact form of a knot and spline model to be retained.
 
-![alt text](http://www.codecogs.com/gif.latex?1+sin(x))
+![alt text](http://www.codecogs.com/gif.latex?1-(1/250))
 
 ## Models:
 Linear regression with knots and splines.
