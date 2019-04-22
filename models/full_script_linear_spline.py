@@ -99,7 +99,7 @@ small_features_list = [
 
 
 training_set = True
-make_plots = False
+make_plots = True
 data_frames_to_transform = [df1, df2, df3 , df4]
 transform_dataframes_add_ys(data_frames_to_transform)
 cols_to_use = small_features_list
@@ -294,8 +294,8 @@ if make_plots == True:
     ax = plt.subplot()
     ax.hist(train_eng_max_cycles, bins = int(180/15),
                 color = 'blue', edgecolor = 'black')
-    ax.set_title('Failure Distribution', size = 15)
-    ax.set_xlabel('Cycles', size = 8)
+    ax.set_title('Distribution of Cycles Until Failure', size = 15)
+    ax.set_xlabel('Cycle Number', size = 8)
     ax.set_ylabel('Count of Engines', size= 8)
     plt.xlim([0,380])
     plt.ylim([0, 20])

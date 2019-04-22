@@ -46,12 +46,22 @@ Most importantly, it would allow for the compact form of a knot and spline model
 
 ## Models:
 Linear regression with knots and splines.
-Each feature that was included in the training data set was bootstrapped and plotted against cycles until failure. For example, the temperature recorded at location 50 for the Low Pressure Turbine (t50_lpt) looked like this:
+Each feature that was included in the training data set was bootstrapped and plotted against cycles until failure. For example, the temperature recorded at location 50 at the low pressure turbine (t50_lpt) exit looked like this:
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/t50_lpt_bs_spline_analysis.png)
 
-Each feature values were then evaluated to determine where the trend showed a marked increase or decrease in slope. These knot locations where then fit to the original data-frame which was transformed using each of the knots as a new feature. The predictive variables  
+Each feature values were then evaluated to determine where the trend showed a marked increase or decrease in slope. At each location a knot value was chosen. These knot locations where then fit to the original data-frame which was transformed using each of the knots as a new feature. This procedure was duplicated for each predictive variable shown in this series of graphs:
+
+![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/all_features_cycles_to_fail.png)
 
 
-Linear regression with a log transformed target variable.
-The plots of the first model indicated that the features contained data that was increasing/decreasing at a rate that was accelerating as the engines approached the end of their life cycle.  This is an indication that a log transformation would be useful. The first transformation was a log transformation of the y variable. Log variables started as high as 5.8 (350 cycles of life) and continued down to 0 (one life cycle remaining). The results where significantly improved.   
+###Linear regression.
+The plots of the first model indicated that the features contained data that was increasing/decreasing at a rate that was accelerating as the engines approached the end of their life cycle. As seen in this plot:
+
+![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/pred_vs_actual_reg_regression.png)
+
+
+###Linear regression with a log transformed target variable.
+This is an indication that a log transformation would be useful. The first transformation was a log transformation of the y variable. Log variables started as high as 5.8 (350 cycles of life) and continued down to 0 (one life cycle remaining). The results where significantly improved as shown in this plot:   
+
+![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/training_cycles_to_fail.png)
