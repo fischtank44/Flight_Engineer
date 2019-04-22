@@ -27,9 +27,11 @@ The second target variable could be optimized for one of two hybrid values. The 
 In either of these two hybrid cases the target for y is derived from the the number of the current cycle and the max number of cycles a specific engine operated to (for example 250 cycles). The target variable in this case would be set to start at:
 
 ![alt text](http://www.codecogs.com/gif.latex?1-\frac{1}{250} )
+
 and it would end at:
 
 ![alt text](http://www.codecogs.com/gif.latex?\frac{250}{250} ).
+
 Thus, it would count up from nearly 0 to 1. While interpreting this value as a probability of failure would be incorrect, it would behave in a manner that is similar to probability of failure. Values that are estimated to be at or near 1 would indicate that the engine was at or near the point of failure.
 
 The same value can be subtracted from 1 (1 - (1/250) ) and would then decrease from nearly 1 to 0. Thus, it would count down from approximately 100% at the beginning of its life to 0% at the end.
