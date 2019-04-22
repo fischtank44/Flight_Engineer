@@ -38,9 +38,9 @@ The same value can be subtracted from 1:
 
 ![alt text](http://www.codecogs.com/gif.latex?1-\frac{1}{250}=.996 )
 
-and would then decrease from nearly 1 to 0. Thus, it would count down from approximately 100% at the beginning of its life to 0% at the end.
+and would then decrease from nearly 1 at the beginning of its life to 0 at the end.
 
-Most importantly, it would allow for the compact form of a knot and spline model to be retained.
+Most importantly, it would allow for the compact form of a knot and spline model to be retained while providing values that closely approximate those derived from a soft probability classifier. 
 
 
 
