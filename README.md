@@ -20,7 +20,11 @@ The training dataset was chosen by randomly sampling 80% of the engines that wer
 
 ## Target variable:
 
-Since each engine was run to failure, the first target variable chosen was the exact number of cycles to failure for each engine. The maximum number of cycles that each engine was able to run varied from 192 – 300 cycles. Thus it was possible for one engine to start with 250 life cycles remaining and another to begin its life with only 175 cycles. By setting the target variable to a countdown to 1 cycle remaining, it was possible to observe the overall trends as each engine experienced degradation as it approached failure.
+Since each engine was run to failure, the first target variable chosen was the exact number of cycles to failure for each engine. The maximum number of cycles that each engine was able to run varied from 128 – 362 cycles.
+
+![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/training_data_failure_distribution.png)
+
+ Thus it was possible for one engine to start with 250 life cycles remaining and another to begin its life with only 175 cycles. By setting the target variable to a countdown to 1 cycle remaining, it was possible to observe the overall trends as each engine experienced degradation as it approached failure.
 
 The second target variable could be optimized for one of two hybrid values. The first could best be described as useful life remaining and the second as amount of useful life used up.
 
@@ -55,13 +59,13 @@ Each feature values were then evaluated to determine where the trend showed a ma
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/all_features_cycles_to_fail.png)
 
 
-### Linear regression.
+### Linear regression predicting cycles to failure.
 The plots of the first model indicated that the features contained data that was increasing/decreasing at a rate that was accelerating as the engines approached the end of their life cycle. As shown in this graph:
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/pred_vs_actual_reg_regression.png)
 
 
-### Linear regression with a log transformed target variable.
-This is an indication that a log transformation would be useful. The first transformation was a log transformation of the y variable. Log variables started as high as 5.8 (350 cycles of life) and continued down to 0 (one life cycle remaining). The results where significantly improved as shown in this plot:   
+### Linear regression predicting log transformed cycles to failure.
+This was an indication that a transformation would be necessary. The first attempt was a natural log transformation of the target value (cycles to failure). The log variables started at values as high as 5.8916 (362 life cycles remaining), but all engines continued down to a value of 0 (1 life cycle remaining). The results where significantly improved as shown in this plot:   
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/training_cycles_to_fail.png)
