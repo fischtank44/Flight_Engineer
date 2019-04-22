@@ -20,11 +20,12 @@ The training dataset was chosen by randomly sampling 80% of the engines that wer
 
 ## Target variable:
 
-Since each engine was run to failure, the first target variable chosen was the exact number of cycles to failure for each engine. The maximum number of cycles that each engine was able to run varied from 128 – 362 cycles.
+Since each engine was run to failure, the first target variable chosen was the exact number of cycles to failure for each engine. The maximum number of cycles that each engine ran varied from 128 – 362 cycles.
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/training_data_failure_distribution.png)
 
- Thus it was possible for one engine to start with 250 life cycles remaining and another to begin its life with only 175 cycles. By setting the target variable to a countdown to 1 cycle remaining, it was possible to observe the overall trends as each engine experienced degradation as it approached failure.
+Thus it was possible for one engine to start with 250 life cycles remaining and another to begin its life with only 175 cycles. By setting the target variable to a countdown to 1 cycle remaining, it was possible to observe
+the common trends shown by all of the engines as they approached failure.
 
 The second target variable could be optimized for one of two hybrid values. The first could best be described as useful life remaining and the second as amount of useful life used up.
 
