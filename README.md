@@ -43,15 +43,15 @@ The same value can be subtracted from 1:
 
 ![alt text](http://www.codecogs.com/gif.latex?1-\frac{1}{250}=.996 )
 
-and would then decrease from nearly 1 at the beginning of its life to 0 at the end.
+and would then decrease from nearly 1 at the beginning of its life to 0 at the end. This value could represent the percent of useful life remaining.
 
-Most importantly, it would allow for the compact form of a knot and spline model to be retained while providing values that closely approximate those derived from a soft probability classifier in the first case to a percent of useful life remaining in the second case.
+While these values do not have a time unit associated with them, they would allow for the compact form of a knot and spline model to be retained. The two alternatives may be preferable in a situation where rolling averages were used and replacement schedules were calculated based on amount of engine life used up
 
 
 
 ## Models:
 Linear regression with knots and splines.
-Each feature that was included in the training data set was bootstrapped and plotted against cycles until failure. For example, the temperature recorded at location 50 at the low pressure turbine (t50_lpt) exit looked like this:
+Each feature that was included in the training data set was bootstrapped and plotted against cycles until failure. For example, the temperature recorded at location 50 at the low pressure turbine outlet (t50_lpt) looked like this:
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/t50_lpt_bs_spline_analysis.png)
 
@@ -60,13 +60,13 @@ Each feature values were then evaluated to determine where the trend showed a ma
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/all_features_cycles_to_fail.png)
 
 
-### Linear regression predicting cycles to failure.
+### Linear regression predicting number of cycles to failure.
 The plots of the first model indicated that the features contained data that was increasing/decreasing at a rate that was accelerating as the engines approached the end of their life cycle. As shown in this graph:
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/pred_vs_actual_reg_regression.png)
 
 
-### Linear regression predicting log transformed cycles to failure.
+### Linear regression predicting log transformed number of cycles to failure.
 This was an indication that a transformation would be necessary. The first attempt was a natural log transformation of the target value (cycles to failure). The log variables started at values as high as 5.8916 (362 life cycles remaining), but all engines continued down to a value of 0 (1 life cycle remaining). The results where significantly improved as shown in this plot:   
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/training_cycles_to_fail.png)
