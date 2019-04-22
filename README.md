@@ -59,6 +59,40 @@ Each feature values were then evaluated to determine where the trend showed a ma
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/all_features_cycles_to_fail.png)
 
+The model was trained using 15 of the 26 features provided:  
+time_cycles, t24_lpc, t30_hpc, t50_lpt, p30_hpc, nf_fan_speed, nc_core_speed, ps_30_sta_press, phi_fp_ps30, nrf_cor_fan_sp, nrc_core_sp, bpr_bypass_rat, htbleed_enthalpy, w31_hpt_cool_bl, and w32_lpt_cool_bl
+
+
+From these features knot locations were chosen as follows:
+
+  time_cycles knot locations: 25, 50, 75, 120, 175 , 220, 240, 260, 280, 300
+  t24_lpc knot locations: 641.5, 642,  642.5, 643.0 , 643.4, 644
+  t30_hpc knot locations: 1584, 1588, 1593, 1598 , 1610
+  t50_lpt knot locations: 1400, 1401, 1411, 1415, 1421, 1430, 1440
+  p30_hpc knot locations: 552.2, 553.2, 554.8, 555, 555.5
+  nf_fan_speed knot locations: 2388.1, 2388.15, 2388.2, 2388.3
+  nc_core_speed knot locations: 9040, 9060, 9070, 9080, 9090
+  ps_30_sta_press knot locations: 47, 47.2, 47.3, 47.45, 47.6, 47.8, 47.9
+  phi_fp_ps30 knot locations: 520, 520.4 , 521.2, 522, 522.4, 523
+  nrf_cor_fan_sp knot locations: 2388.6, 2388.2 , 2388.3, 2388.4
+  nrc_core_sp knot locations: 8107.4 , 8117, 8127.5 , 8138.7 , 8149.4 , 8160 , 8171 , 8200 , 8250
+  bpr_bypass_rat knot locations: 8.38, 8.41, 8.45, 8.49
+  htbleed_enthalpy knot locations: 389, 390, 391, 392, 393, 394,395, 396, 397, 398, 399
+  w31_hpt_cool_bl knot locations: 38.5, 38.7, 38.9, 39.1, 39.2
+  w32_lpt_cool_bl knot locations: 23.14, 23.2,  23.32, 23.44
+
+
+
+## Pruning the knots:
+After the model was trained, the variables were evaluated using a partial dependency plot.
+
+![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/partial_dependency_pipline.png)
+
+Large variations at the edges were pruned and the model performance improved at the points where the predictions would move closer to 0.
+
+![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/pruned_partial_dependency_pipline.png)
+
+Finally, additional knots needed to be pruned in nf_fan_speed and htbleed_enthalpy. 
 
 ### Linear regression predicting number of cycles to failure.
 The plots of the first model indicated that the features contained data that was increasing/decreasing at a rate that was accelerating as the engines approached the end of their life cycle. As shown in this graph:

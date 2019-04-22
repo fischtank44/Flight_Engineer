@@ -400,7 +400,7 @@ if make_plots==True:
 ###    (ax, df, y, var_name,
 if make_plots==True:
     for col in train_features:
-        fig, ax = plt.subplots(figsize=(12, 3))
+        fig, ax = plt.subplots(figsize=(12, 5))
         plot_one_univariate(ax, df, target_variable, col )
         ax.set_title("Evaluation of: " + str(col))
         plt.xlabel(col)
