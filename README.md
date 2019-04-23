@@ -60,10 +60,25 @@ Each feature values were then evaluated to determine where the trend showed a ma
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/all_features_cycles_to_fail.png)
 
 The model was trained using 15 of the 26 features provided:  
-time_cycles, t24_lpc, t30_hpc, t50_lpt, p30_hpc, nf_fan_speed, nc_core_speed, ps_30_sta_press, phi_fp_ps30, nrf_cor_fan_sp, nrc_core_sp, bpr_bypass_rat, htbleed_enthalpy, w31_hpt_cool_bl, and w32_lpt_cool_bl
+Number of cycles the engine has been operating: time_cycles (integer)
+Temperature at the low pressure compressor outlet: t24_lpc (degrees Rankin = degrees Fahrenheit + 459.67)
+Temperature at the high pressure compressor outlet: t30_hpc (degrees Rankin)
+Temperature at the low pressure turbine outlet: t50_lpt (degrees Rankin)
+Pressure at the high pressure compressor: p30_hpc (psi)
+Rotation speed of the fan: nf_fan_speed (rpm)
+Rotation speed of the core: nc_core_speed (rpm)
+Pressure at the high pressure compressor: ps_30_sta_press (psi)
+Phi something something darkside: phi_fp_ps30
+Corrected fan speed: nrf_cor_fan_sp (psi)
+Corrected core speed: nrc_core_sp (rpm)
+bpr_bypass_rat (something devided by something else)
+Ht Bleed enthalpy: htbleed_enthalpy (energy + (pressure * volume) )
+High pressure turbine coolant bleed: w31_hpt_cool_bl (lbm/s - pound mass per second)
+Low pressure turbine coolant bleed: w32_lpt_cool_bl (lbm/s - pound mass per second)
 
 
-From these features knot locations were chosen as follows:
+
+From these features knot locations were selected at specific values measured by the above sensors:
 
   time_cycles knot locations: 25, 50, 75, 120, 175 , 220, 240, 260, 280, 300
   t24_lpc knot locations: 641.5, 642,  642.5, 643.0 , 643.4, 644
@@ -92,7 +107,7 @@ Large variations at the edges were pruned and the model performance improved at 
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/pruned_partial_dependency_pipline.png)
 
-Finally, additional knots needed to be pruned in nf_fan_speed and htbleed_enthalpy. 
+Finally, additional knots needed to be pruned in nf_fan_speed and htbleed_enthalpy.
 
 ### Linear regression predicting number of cycles to failure.
 The plots of the first model indicated that the features contained data that was increasing/decreasing at a rate that was accelerating as the engines approached the end of their life cycle. As shown in this graph:
