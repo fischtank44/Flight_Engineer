@@ -50,7 +50,7 @@ While these values do not have a time unit associated with them, they would allo
 
 
 ## Models:
-Linear regression with knots and splines.
+### Linear regression with knots and splines.
 Each feature that was included in the training data set was bootstrapped and plotted against cycles until failure. For example, the temperature recorded at location 50 at the low pressure turbine outlet (t50_lpt) looked like this:
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/t50_lpt_bs_spline_analysis.png)
@@ -97,7 +97,7 @@ From these features knot locations were selected at specific values measured by 
 
 
 
-## Pruning the knots:
+#### Pruning the knots:
 After the model was trained, the variables were evaluated using a partial dependency plot.
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/partial_dependency_pipline.png)
@@ -129,4 +129,6 @@ The final output of the model was exported to a text file that included the coef
 
 After placing the formula in Tableau the estimation of cycles remaining can calculated from the data as it is being read into the program. There is no need for any additional processing or for scripts to be run in order for model estimations to be completed. The entirety of this model can me transported in a 6kB text file.
 
-[Tableau Output](https://public.tableau.com/profile/steven.fischbach#!/vizhome/FlightEngineer-v4_2/CautionsvsBigFormula)
+[Tableau Public Site](https://public.tableau.com/profile/steven.fischbach#!/vizhome/FlightEngineer-v4_2/CautionsvsBigFormula)
+
+![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/cycles_to_fail.png)
