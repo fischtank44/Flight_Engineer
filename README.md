@@ -71,7 +71,7 @@ The model was trained using 15 of the 26 features provided:
 - Phi something something darkside: phi_fp_ps30
 - Corrected fan speed: nrf_cor_fan_sp (psi)
 - Corrected core speed: nrc_core_sp (rpm)
-- bpr_bypass_rat (something devided by something else)
+- bpr_bypass_rat: (something devided by something else)
 - Ht Bleed enthalpy: htbleed_enthalpy (energy + (pressure * volume) )
 - High pressure turbine coolant bleed: w31_hpt_cool_bl (lbm/s - pound mass per second)
 - Low pressure turbine coolant bleed: w32_lpt_cool_bl (lbm/s - pound mass per second)
@@ -93,7 +93,7 @@ From these features knot locations were selected at specific values measured by 
 - bpr_bypass_rat knot locations: 8.38, 8.41, 8.45, 8.49
 - htbleed_enthalpy knot locations: 389, 390, 391, 392, 393, 394,395, 396, 397, 398, 399
 - w31_hpt_cool_bl knot locations: 38.5, 38.7, 38.9, 39.1, 39.2
-- w32_lpt_cool_bl knot locations: 23.14, 23.2,  23.32, 23.44
+- w32_lpt_cool_bl knot locations: 23.14, 23.2, 23.32, 23.44
 
 
 
