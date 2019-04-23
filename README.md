@@ -61,7 +61,7 @@ Each feature values were then evaluated to determine where the trend showed a ma
 
 The model was trained using 15 of the 26 features provided:  
 - Number of cycles the engine has been operating: time_cycles (integer)
-Temperature at the low pressure compressor outlet: t24_lpc (degrees Rankin = degrees Fahrenheit + 459.67)
+- Temperature at the low pressure compressor outlet: t24_lpc (degrees Rankin = degrees Fahrenheit + 459.67)
 Temperature at the high pressure compressor outlet: t30_hpc (degrees Rankin)
 Temperature at the low pressure turbine outlet: t50_lpt (degrees Rankin)
 Pressure at the high pressure compressor: p30_hpc (psi)
