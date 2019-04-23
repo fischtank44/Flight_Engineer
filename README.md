@@ -60,9 +60,9 @@ Each feature values were then evaluated to determine where the trend showed a ma
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/all_features_cycles_to_fail.png)
 
 The model was trained using 15 of the 26 features provided:  
-![alt text] Number of cycles the engine has been operating: time_cycles (integer)
-![alt text] Temperature at the low pressure compressor outlet: t24_lpc (degrees Rankin = degrees Fahrenheit + 459.67)
-![alt text] Temperature at the high pressure compressor outlet: t30_hpc (degrees Rankin)
+- Number of cycles the engine has been operating: time_cycles (integer)
+Temperature at the low pressure compressor outlet: t24_lpc (degrees Rankin = degrees Fahrenheit + 459.67)
+Temperature at the high pressure compressor outlet: t30_hpc (degrees Rankin)
 Temperature at the low pressure turbine outlet: t50_lpt (degrees Rankin)
 Pressure at the high pressure compressor: p30_hpc (psi)
 Rotation speed of the fan: nf_fan_speed (rpm)
