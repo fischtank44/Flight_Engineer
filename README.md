@@ -60,21 +60,21 @@ Each feature values were then evaluated to determine where the trend showed a ma
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/all_features_cycles_to_fail.png)
 
 The model was trained using 15 of the 26 features provided:  
--Number of cycles the engine has been operating: time_cycles (integer)
--Temperature at the low pressure compressor outlet: t24_lpc (degrees Rankin = degrees Fahrenheit + 459.67)
--Temperature at the high pressure compressor outlet: t30_hpc (degrees Rankin)
--Temperature at the low pressure turbine outlet: t50_lpt (degrees Rankin)
--Pressure at the high pressure compressor: p30_hpc (psi)
--Rotation speed of the fan: nf_fan_speed (rpm)
--Rotation speed of the core: nc_core_speed (rpm)
--Pressure at the high pressure compressor: ps_30_sta_press (psi)
--Phi something something darkside: phi_fp_ps30
--Corrected fan speed: nrf_cor_fan_sp (psi)
--Corrected core speed: nrc_core_sp (rpm)
--bpr_bypass_rat (something devided by something else)
--Ht Bleed enthalpy: htbleed_enthalpy (energy + (pressure * volume) )
--High pressure turbine coolant bleed: w31_hpt_cool_bl (lbm/s - pound mass per second)
--Low pressure turbine coolant bleed: w32_lpt_cool_bl (lbm/s - pound mass per second)
+![alt text] Number of cycles the engine has been operating: time_cycles (integer)
+![alt text] Temperature at the low pressure compressor outlet: t24_lpc (degrees Rankin = degrees Fahrenheit + 459.67)
+![alt text] Temperature at the high pressure compressor outlet: t30_hpc (degrees Rankin)
+Temperature at the low pressure turbine outlet: t50_lpt (degrees Rankin)
+Pressure at the high pressure compressor: p30_hpc (psi)
+Rotation speed of the fan: nf_fan_speed (rpm)
+Rotation speed of the core: nc_core_speed (rpm)
+Pressure at the high pressure compressor: ps_30_sta_press (psi)
+Phi something something darkside: phi_fp_ps30
+Corrected fan speed: nrf_cor_fan_sp (psi)
+Corrected core speed: nrc_core_sp (rpm)
+bpr_bypass_rat (something devided by something else)
+Ht Bleed enthalpy: htbleed_enthalpy (energy + (pressure * volume) )
+High pressure turbine coolant bleed: w31_hpt_cool_bl (lbm/s - pound mass per second)
+Low pressure turbine coolant bleed: w32_lpt_cool_bl (lbm/s - pound mass per second)
 
 
 
