@@ -122,3 +122,9 @@ This was an indication that a transformation would be necessary. The first attem
 and from the test set:
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/test_cycles_to_fail.png)
+
+
+### The model output
+The final output of the model was exported to a text file that included the coefficients, knot locations, and y intercept terms in a form that could be placed into a calculated field in tableau. The full text is available here [full text]( )
+
+[Tableau Output](https://public.tableau.com/profile/steven.fischbach#!/vizhome/FlightEngineer-v4_2/CautionsvsBigFormula)
