@@ -99,7 +99,7 @@ small_features_list = [
 
 
 training_set = True
-make_plots = True
+make_plots = False
 data_frames_to_transform = [df1, df2, df3 , df4]
 transform_dataframes_add_ys(data_frames_to_transform)
 cols_to_use = small_features_list
@@ -805,23 +805,23 @@ df_new_train.shape
 
 ########################   Export Model  as a pickle   ########################
 
-# import pickle
+import pickle
 
 
 
-# s = pickle.dumps(model)
-# clf2 = pickle.loads(s)
+s = pickle.dumps(model)
+clf2 = pickle.loads(s)
 
-# # # clf2.predict(X[0:1])
-# # array([0])
-# # y[0]
+# # clf2.predict(X[0:1])
+# array([0])
+# y[0]
 
 
 
-# from joblib import dump, load
-# dump(model, 'knot_spline.joblib') 
+from joblib import dump, load
+dump(model, 'knot_spline.joblib') 
 
-# pickle.dump(model, open("model.pkl","wb"))
+pickle.dump(model, open("model.pkl","wb"))
 
 ###############################################################
 

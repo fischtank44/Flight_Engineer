@@ -125,6 +125,8 @@ and from the test set:
 
 
 ### The model output
-The final output of the model was exported to a text file that included the coefficients, knot locations, and y intercept terms in a form that could be placed into a calculated field in tableau. The full text is available here [full text]( )
+The final output of the model was exported to a text file that included the coefficients, knot locations, and y intercept terms in a form that could be placed into a calculated field in tableau. The full text is available here [full text](https://github.com/fischtank44/flight_engineer/raw/master/outputs/tableau_format_formula.txt)
+
+After placing the formula in Tableau the estimation of cycles remaining can calculated from the data as it is being read into the program. There is no need for any additional processing or for scripts to be run in order for model estimations to be completed. The entirety of this model can me transported in a 6kB text file.
 
 [Tableau Output](https://public.tableau.com/profile/steven.fischbach#!/vizhome/FlightEngineer-v4_2/CautionsvsBigFormula)

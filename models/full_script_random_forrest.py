@@ -353,6 +353,32 @@ plt.legend()
 plt.show()
 
 ########################################################################################
+
+import pickle
+
+
+
+s = pickle.dumps(rf)
+clf2 = pickle.loads(s)
+
+# # clf2.predict(X[0:1])
+# array([0])
+# y[0]
+
+
+
+from joblib import dump, load
+dump(rf, 'rf_class.joblib') 
+
+pickle.dump(rf, open("rf_class.pkl","wb"))
+
+###############################################################
+
+
+
+
+
+
 ########################################################################################
                 ##### Try Gradiant Boost  ########
 
