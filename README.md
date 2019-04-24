@@ -123,10 +123,20 @@ and from the test set:
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/test_cycles_to_fail.png)
 
-Converting these estimates back into an estimate of cycles to fail can be accomplished by raising the value to the:
+Converting these estimates back into an estimate of cycles to fail can be accomplished by raising the value to the exponential of estimate:
+
 ![alt text](http://www.codecogs.com/gif.latex?e^{\hat{y}})
 
+
 ### Training set vs Test set for each engine
+The predictions and the actual values for the 80 engines in the training set are below.
+
+![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/all_80_failure_right_num_cycles.png)
+
+
+The predictions for the 20 engines in the test set have show similar patterns.
+
+![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/20_test_set_y_actual_num_cycles.png)
 
 
 ### The model output
