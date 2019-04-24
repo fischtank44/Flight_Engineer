@@ -134,7 +134,7 @@ The predictions and the actual values for the 80 engines in the training set are
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/all_80_failure_right_num_cycles.png)
 
 
-The predictions for the 20 engines in the test set have show similar patterns.
+The predictions for the 20 engines in the test set show similar patterns which indicates that, given that the environment remains constant, the model will perform similarly when in production.
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/20_test_set_y_actual_num_cycles.png)
 
