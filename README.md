@@ -124,7 +124,7 @@ and from the test set:
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/test_cycles_to_fail.png)
 
 Converting these estimates back into an estimate of cycles to fail can be accomplished by raising the value to the:
-![alt text](http://www.codecogs.com/gif.latex?\e^{\hat{y}})
+![alt text](http://www.codecogs.com/gif.latex?e^{\hat{y}})
 
 ### Training set vs Test set for each engine
 
