@@ -108,13 +108,13 @@ Large variations at the edges were pruned and the model performance improved at 
 
 Finally, additional knots needed to be pruned in nf_fan_speed and htbleed_enthalpy.
 
-### Linear regression predicting number of cycles to failure.
+### Linear regression predicting number of cycles to fail.
 The plots of the first model indicated that the features contained data that was increasing/decreasing at a rate that was accelerating as the engines approached the end of their life cycle. As shown in this graph:
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/pred_vs_actual_reg_regression.png)
 
 
-### Linear regression predicting log transformed number of cycles to failure.
+### Linear regression predicting the natural log of cycles to fail.
 The curve in the predictions is a clear indication that a log transformation should be attempted. The first option was natural log transformation of the target value (cycles to failure). The log variables started at values as high as 5.8916 (362 life cycles remaining) and all engines continued down to a value of 0 (1 life cycle remaining). The results where significantly improved as shown in this plot:   
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/training_cycles_to_fail.png)
