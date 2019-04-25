@@ -119,7 +119,7 @@ The curve in the predictions is a clear indication that a log transformation sho
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/training_cycles_to_fail.png)
 
-and from the test set:
+and the results from the test set showed similar patterns:
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/test_cycles_to_fail.png)
 
