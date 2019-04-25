@@ -10,7 +10,7 @@ These files demonstrate analysis of data from a NASA study of turbofan engine fa
 
 ## Data import:
 
-The information from the training set needed to be imported to pandas for analysis. Each engine, the number of cycles, and data collected from each observation were included in the data. The information was relatively clean and organized; however, it did not have an included target variable.
+The information from the training set needed to be imported to pandas for analysis. Each engine, the number of cycles, and data collected from each observation were included in the data. The information was relatively clean and organized; however, it did not have an identified target variable.
 
 
 ## Training and test sets:
@@ -27,6 +27,7 @@ Since each engine was run to failure, the first target variable chosen was the e
 Thus it was possible for one engine to start with 250 life cycles remaining and another to begin its life with only 175 cycles. By setting the target variable to a countdown to 1 cycle remaining, it was possible to observe
 the common trends shown by all of the engines as they approached failure.
 
+### Additional options for target variable.
 The second target variable could be optimized for one of two hybrid values. The first could best be described as useful life remaining and the second as amount of useful life used up.
 
 In either of these two hybrid cases the target for y is derived from the the number of the current cycle and the max number of cycles a specific engine operated to (for example 250 cycles). The target variable in this case would be set to start at:
