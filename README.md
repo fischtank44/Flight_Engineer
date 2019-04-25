@@ -115,7 +115,7 @@ The plots of the first model indicated that the features contained data that was
 
 
 ### Linear regression predicting the natural log of cycles to fail.
-The curve in the predictions is a clear indication that a log transformation should be attempted. The first option was natural log transformation of the target value (cycles to failure). The log variables started at values as high as 5.8916 (362 life cycles remaining) and all engines continued down to a value of 0 (1 life cycle remaining). The results where significantly improved as shown in this plot:   
+The curve in the predictions is a clear indication that a log transformation should be attempted. The first option was natural log transformation of the target value (cycles to failure). The log variables started at values as high as 5.8916 (362 life cycles remaining) and all engines continued down to a natural log value of 0 (1 life cycle remaining). The results where significantly improved as shown in this plot:   
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/training_cycles_to_fail.png)
 
