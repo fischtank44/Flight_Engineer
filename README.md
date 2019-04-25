@@ -1,4 +1,4 @@
-# Flight Engineer [Flight Engineer](https://github.com/fischtank44/Flight_Engineer/raw/master/Flight-engineer-writeup.pdf)
+# Flight Engineer [Handout](https://github.com/fischtank44/Flight_Engineer/raw/master/Flight-engineer-writeup.pdf)
 Full spectrum aviation business study.
 
 This is a multi-faceted analysis of an aviation business problem that grew from aircraft engine data available from NASA. [PCoE Datasets](https://ti.arc.nasa.gov/tech/dash/groups/pcoe/prognostic-data-repository/). This dataset is the publicly available: [Turbofan Engine Degradation Simulation Data Set](https://ti.arc.nasa.gov/tech/dash/groups/pcoe/prognostic-data-repository/publications/#turbofan).
