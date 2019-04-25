@@ -103,7 +103,7 @@ After the model was trained, the variables were evaluated using a partial depend
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/partial_dependency_pipline.png)
 
-Large variations at the edges were pruned and the model performance improved at the points where the predictions would move closer to 0.
+Large variations at the edges were pruned and the model performance improved at the points where the predictions indicated end of life.
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/pruned_partial_dependency_pipline.png)
 
