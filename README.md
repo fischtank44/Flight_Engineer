@@ -71,7 +71,7 @@ The model was trained using 15 of the 26 features provided:
 - Power factor (calculated): phi_fp_ps30
 - Corrected fan speed: nrf_cor_fan_sp (psi)
 - Corrected core speed: nrc_core_sp (rpm)
-- bpr_bypass_rat: (bypass ratio)
+- bpr_bypass_rat: bypass ratio
 - Ht Bleed enthalpy: htbleed_enthalpy (energy + (pressure * volume) )
 - High pressure turbine coolant bleed: w31_hpt_cool_bl (lbm/s - pound mass per second)
 - Low pressure turbine coolant bleed: w32_lpt_cool_bl (lbm/s - pound mass per second)
