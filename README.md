@@ -5,7 +5,7 @@ This is a multi-faceted analysis of an aviation business problem that grew from 
 
 ## Engine Training Data: [Data Files](https://github.com/fischtank44/Engine_training_data/tree/master/Data_Files)
 
-These files demonstrate analysis of data from a NASA study of turbofan engine failures. This is a front to back evaluation of the data beginning by using SQL to extract data, excel to clean data, and analyzing data in Tableau. Finally, two outputs are provided. The first is a predictive formula that attempts to provide an estimate of cycles remaining and the second is a real time assessment of the engines current health using visualizations all in Tableau.
+These files demonstrate analysis of data from a NASA study of turbofan engine failures. This is a front to back evaluation of the data beginning by using SQL to extract data, multiple methods to clean data, python data analysis, and finally deploying a model in Tableau. The result is a proof of concept that demonstrates that a multi-variate linear spline algorithm can be inserted into a Tableau calculated field.
 
 
 ## Data import:
