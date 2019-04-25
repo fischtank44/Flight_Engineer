@@ -107,7 +107,9 @@ Large variations at the edges were pruned and the model performance improved at 
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/pruned_partial_dependency_pipline.png)
 
-Finally, additional knots needed to be pruned in nf_fan_speed and htbleed_enthalpy.
+Finally, additional knots needed to be pruned in nf_fan_speed and htbleed_enthalpy. The final result shows that the variation in the coefficients has been reduced.
+
+![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/final_pruned_partial_dependency_pipline.png)
 
 ### Linear regression predicting number of cycles to fail.
 The plots of the first model indicated that the features contained data that was increasing/decreasing at a rate that was accelerating as the engines approached the end of their life cycle. As shown in this graph:
