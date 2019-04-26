@@ -132,7 +132,7 @@ Converting these estimates back into an estimate of cycles to fail can be accomp
 
 
 ### Training set vs Test set for each engine
-The predictions and the actual values for the 80 engines in the training set are below.
+The predictions and the actual values for the 80 engines in the training set are below. The predicted values are in red and the true value is in blue.
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/all_80_failure_right_num_cycles.png)
 
