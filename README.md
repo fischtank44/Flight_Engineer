@@ -101,15 +101,15 @@ From these features knot locations were selected at specific values measured by 
 #### Pruning the knots:
 After the model was trained, the variables were evaluated using a partial dependency plot.
 
-![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/partial_dependency_pipline.png)
+![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/partial_dependency_pipeline.png)
 
 Large variations at the edges were pruned and the model performance improved at the points where the predictions indicated end of life.
 
-![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/pruned_partial_dependency_pipline.png)
+![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/pruned_partial_dependency_pipeline.png)
 
 Finally, additional knots needed to be pruned in nf_fan_speed and htbleed_enthalpy. The final result shows that the variation in the coefficient values have been significantly reduced.
 
-![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/final_pruned_partial_dependency_pipline.png)
+![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/final_pruned_partial_dependency_pipeline.png)
 
 ### Linear regression predicting number of cycles to fail.
 The plots of the first model indicated that the features contained data that was increasing/decreasing at a rate that was accelerating as the engines approached the end of their life cycle. As shown in this graph:
