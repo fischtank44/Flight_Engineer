@@ -744,59 +744,59 @@ if make_plots == True:
 # This creates a list of models, one for each bootstrap sample.
 
 
-# feature_pipeline.fit(df_new_train)
-# features_f = feature_pipeline.transform(df_new_train)
+feature_pipeline.fit(df_new_train)
+features_f = feature_pipeline.transform(df_new_train)
 
 
-# model = LinearRegression(fit_intercept=True)
-# model.fit(features_f.values, np.log(df_new_train[target_variable])) 
+model = LinearRegression(fit_intercept=True)
+model.fit(features_f.values, np.log(df_new_train[target_variable])) 
 
-# cols_to_use = [
-#     'time_cycles', 
-#     't24_lpc', 
-#     't30_hpc', 
-#     't50_lpt', 
-#     'p30_hpc', 
-#     'nf_fan_speed', 
-#     # 'nc_core_speed', 
-#     'ps_30_sta_press', 
-#     'phi_fp_ps30', 
-#     'nrf_cor_fan_sp', 
-#     # 'nrc_core_sp', 
-#     'bpr_bypass_rat', 
-#     'htbleed_enthalpy', 
-#     'w31_hpt_cool_bl', 
-#     'w32_lpt_cool_bl']
-
-
-# # feature_pipeline.fit(df)
-# # features = feature_pipeline.transform(df)
-
-# models = bootstrap_train(
-#     LinearRegression, 
-#     features_f.values, 
-#     np.log(df_new_test[target_variable].values),
-#     bootstraps=500,
-#     fit_intercept=True
-# )
+cols_to_use = [
+    'time_cycles', 
+    't24_lpc', 
+    't30_hpc', 
+    't50_lpt', 
+    'p30_hpc', 
+    'nf_fan_speed', 
+    # 'nc_core_speed', 
+    'ps_30_sta_press', 
+    'phi_fp_ps30', 
+    'nrf_cor_fan_sp', 
+    # 'nrc_core_sp', 
+    'bpr_bypass_rat', 
+    'htbleed_enthalpy', 
+    'w31_hpt_cool_bl', 
+    'w32_lpt_cool_bl']
 
 
-# # fig, axs = plot_bootstrap_coefs(models, features.columns, n_col=4)
-# # plt.show()
+# feature_pipeline.fit(df)
+# features = feature_pipeline.transform(df)
+
+models = bootstrap_train(
+    LinearRegression, 
+    features_f.values, 
+    np.log(df_new_train[target_variable].values),
+    bootstraps=500,
+    fit_intercept=True
+)
 
 
-# fig, axs = plot_partial_dependences(
-#      model, 
-#      X=df_new_train,
-#      var_names=cols_to_use,
-#      pipeline=feature_pipeline,
-#      bootstrap_models=models,
-#      y=None#np.log(df[target_variable]).values  
-#      )
-# # fig.tight_layout()
-
-
+# fig, axs = plot_bootstrap_coefs(models, features.columns, n_col=4)
 # plt.show()
+
+
+fig, axs = plot_partial_dependences(
+     model, 
+     X=df_new_train,
+     var_names=cols_to_use,
+     pipeline=feature_pipeline,
+     bootstrap_models=models,
+     y=None#np.log(df[target_variable]).values  
+     )
+# fig.tight_layout()
+
+
+plt.show()
 
 
 model.intercept_
