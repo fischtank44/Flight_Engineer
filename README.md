@@ -1,24 +1,24 @@
-# Flight Engineer [Handout](https://github.com/fischtank44/Flight_Engineer/raw/master/Flight-engineer-writeup.pdf)
+## Flight Engineer [Handout](https://github.com/fischtank44/Flight_Engineer/raw/master/Flight-engineer-writeup.pdf)
 Full spectrum aviation business study.
 
 This is a multi-faceted analysis of an aviation business problem that grew from aircraft engine data available from NASA. [PCoE Datasets](https://ti.arc.nasa.gov/tech/dash/groups/pcoe/prognostic-data-repository/). This dataset is the publicly available: [Turbofan Engine Degradation Simulation Data Set](https://ti.arc.nasa.gov/tech/dash/groups/pcoe/prognostic-data-repository/publications/#turbofan).
 
-## Engine Training Data: [Data Files](https://github.com/fischtank44/Engine_training_data/tree/master/Data_Files)
+### Engine Training Data: [Data Files](https://github.com/fischtank44/Engine_training_data/tree/master/Data_Files)
 
 These files demonstrate analysis of data from a NASA study of turbofan engine failures. This is a front to back evaluation of the data beginning by using SQL to extract data, multiple methods to clean data, python data analysis, and finally deploying a model in Tableau. The result is a proof of concept that demonstrates that a multi-variate linear spline algorithm can be inserted into a Tableau calculated field.
 
 
-## Data import:
+### Data import:
 
 The information from the training set needed to be imported to pandas for analysis. Each engine, the number of cycles, and data collected from each observation were included in the data. The information was relatively clean and organized; however, it did not have an identified target variable.
 
 
-## Training and test sets:
+### Training and test sets:
 
 The training dataset was chosen by randomly sampling 80% of the engines that were run during the experiment. The remaining 20% of the engines were held in reserve for the test set. Some of the features were not used or where not predictive. The features for the model were evaluated based on their standard deviation and only those that had values more than  0.01 where included in the list of features to train to.   
 
 
-## Target variable:
+### Target variable:
 
 Since each engine was run to failure, the first target variable chosen was the exact number of cycles to failure for each engine. The maximum number of cycles that each engine ran varied from 128 – 362 cycles.
 
@@ -27,7 +27,7 @@ Since each engine was run to failure, the first target variable chosen was the e
 Thus it was possible for one engine to start with 250 life cycles remaining and another to begin its life with only 175 cycles. By setting the target variable to a countdown to 1 cycle remaining, it was possible to observe
 the common trends shown by all of the engines as they approached failure.
 
-### Additional options for target variable.
+#### Additional options for target variable.
 The second target variable could be optimized for one of two hybrid values. The first could best be described as useful life remaining and the second as amount of useful life used up.
 
 In either of these two hybrid cases the target for y is derived from the the number of the current cycle and the max number of cycles a specific engine operated to (for example 250 cycles). The target variable in this case would be set to start at:
@@ -50,8 +50,8 @@ While these values do not have a time unit associated with them, they would allo
 
 
 
-## Models:
-### Linear regression with knots and splines.
+### Models:
+#### Linear regression with knots and splines.
 Each feature that was included in the training data set was bootstrapped and plotted against cycles until failure. For example, the temperature recorded at location 50 at the low pressure turbine outlet (t50_lpt) looked like this:
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/t50_lpt_bs_spline_analysis.png)
@@ -98,7 +98,7 @@ From these features knot locations were selected at specific values measured by 
 
 
 
-#### Pruning the knots:
+##### Pruning the knots:
 After the model was trained, the variables were evaluated using a partial dependency plot.
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/partial_dependency_pipeline.png)
@@ -109,13 +109,13 @@ This process was repeated for the nf_fan_speed and htbleed_enthalpy . The final 
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/final_pruned_partial_dependency_pipeline.png)
 
-### Linear regression predicting number of cycles to fail.
+#### Linear regression predicting number of cycles to fail.
 The plots of the first model indicated that the features contained data that was increasing/decreasing at a rate that was accelerating as the engines approached the end of their life cycle. As shown in this graph:
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/pred_vs_actual_reg_regression.png)
 
 
-### Linear regression predicting the natural log of cycles to fail.
+#### Linear regression predicting the natural log of cycles to fail.
 The curve in the predictions is a clear indication that a log transformation should be attempted. The first option was natural log transformation of the target value (cycles to failure). The log variables started at values as high as 5.8916 (362 life cycles remaining) and all engines continued down to a natural log value of 0 (1 life cycle remaining). The results where significantly improved as shown in this plot:   
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/training_cycles_to_fail.png)
@@ -129,7 +129,7 @@ Converting these estimates back into an estimate of cycles to fail can be accomp
 ![alt text](http://www.codecogs.com/gif.latex?e^{\hat{y}}=cycles)
 
 
-### Training set vs Test set for each engine
+#### Training set vs Test set for each engine
 The predictions and the actual values for the 80 engines in the training set are below. The predicted values are in red and the true value is in blue.
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/all_80_failure_right_num_cycles.png)
@@ -140,7 +140,7 @@ The predictions for the 20 engines in the test set show patterns similar to the 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/20_test_set_y_actual_num_cycles.png)
 
 
-### The model output
+#### The model output
 The final output of the model was exported to a text file that included the coefficients, knot locations, and y intercept terms in a form that could be placed into a calculated field in tableau. The full text is available here [full text](https://github.com/fischtank44/flight_engineer/raw/master/outputs/tableau_format_formula.txt)
 
 After placing the formula in Tableau the estimation of cycles remaining can calculated from the data as it is being read into the program. There is no need for any additional processing or for scripts to be run in order for model estimations to be completed. The entirety of this model can me transported in a 6kB text file.
