@@ -98,11 +98,8 @@ small_features_list = [
 #######      List of vaiables and features for model    #######
 
 
-training_set = True
-make_plots = False
 data_frames_to_transform = [df1]   # , df2, df3 , df4]
 transform_dataframes_add_ys(data_frames_to_transform)
-cols_to_use = small_features_list
 df = df1          #<----- #This is the dataframe to use for the model
 target_variable = 'cycles_to_fail'  #   or 'y_failure'
 
@@ -160,14 +157,14 @@ ax.set_title("R2 Values of Test Set")
 # start_idx = 0
 for idx, ax in enumerate(axs.flatten()):
     # for num in range(5):
-    print(idx)
+    # print(idx)
     test_engines = test_engines_full[0+(20 * idx): 20 + (20 * idx)]
     # print(test_engines)
     train_engines = []
     for eng in range(1,101):
         if eng not in test_engines:
             train_engines.append(eng)
-    print(test_engines)
+    # print(train_engines)
     test_idx = df['unit'].apply(lambda x: x in test_engines)
     train_idx = df['unit'].apply(lambda x: x in train_engines)
     test_list = list(test_idx)
@@ -183,18 +180,23 @@ for idx, ax in enumerate(axs.flatten()):
     features = feature_pipeline.transform(df_new_train)
     model = LinearRegression(fit_intercept=True)
     model.fit(features.values, np.log(y_train))
+    y_hat_train = np.exp(model.predict(features.values) )
+    print ("MSE for Training Set " + str(idx) + " "  + str(mse(y_train, y_hat_train)) )
     feature_pipeline.fit(df_new_test)
     features = feature_pipeline.transform(df_new_test)
     y_hat = np.exp(model.predict(features.values) )
-    print ("MSE for set " + str(idx) + " "  + str(r2(y_test, y_hat)) )
-    r2_values = r2_generator_last_n_cycles(y_hat , y_test, 150)
+    # print (len(y_test) , len(y_hat) )
+    # print (y_hat, type(y_hat))
+    print ("MSE for Test Set " + str(idx) + " "  + str(mse(y_test, y_hat)) )
+    r2_values = r2_generator_last_n_cycles(y_test , y_hat, 350)
+    # print(len(r2_values))
     # fig, ax = plt.subplots(1, 1, figsize=(13, 13))
     ax.scatter(range(len(r2_values)+1, 1, -1) , r2_values)
-    ax.set_ylim(-2, 1)
+    ax.set_ylim(-2, 2500)
     ax.set_xlim(len(r2_values), 0)
-    ax.set_title('R Squared for set: ' + str(idx+1))
+    ax.set_title('Mean Squared Error for set: ' + str(idx+1))
     ax.set_xlabel('Cycles to Fail')
-    ax.set_ylabel( 'R Squared Value')
+    ax.set_ylabel( 'MSE')
 
 
 
@@ -243,7 +245,7 @@ def r2_generator_last_n_cycles(y_hat , y_act, last_n=50):
         for idx, cycle in enumerate(y_act):
             # print(num)
             if cycle <= num:
-                print(cycle, num, y_hat[idx])
+                # print(cycle, num, y_hat[idx])
                 ypred_n.append(y_hat[idx])
                 y_act_n.append(cycle)
         # print(ypred_n, y_act_n)

@@ -92,7 +92,7 @@ From these features knot locations were selected at specific values measured by 
 - nrf_cor_fan_sp knot locations: 2388.6, 2388.2 , 2388.3, 2388.4
 - nrc_core_sp knot locations: 8107.4 , 8117, 8127.5 , 8138.7 , 8149.4 , 8160 , 8171 , 8200 , 8250
 - bpr_bypass_rat knot locations: 8.38, 8.41, 8.45, 8.49
-- htbleed_enthalpy knot locations: 389, 390, 391, 392, 393, 394,395, 396, 397, 398, 399
+- htbleed_enthalpy knot locations: 389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 399
 - w31_hpt_cool_bl knot locations: 38.5, 38.7, 38.9, 39.1, 39.2
 - w32_lpt_cool_bl knot locations: 23.14, 23.2, 23.32, 23.44
 
@@ -105,9 +105,7 @@ After the model was trained, the variables were evaluated using a partial depend
 
 Large variations at the edges were pruned and the model performance improved at the points where the predictions indicated end of life.
 
-![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/pruned_partial_dependency_pipeline.png)
-
-Finally, additional knots needed to be pruned in nf_fan_speed and htbleed_enthalpy. The final result shows that the variation in the coefficient values have been significantly reduced.
+This process was repeated for the nf_fan_speed and htbleed_enthalpy . The final result shows that the variation in the coefficient values have been significantly reduced.
 
 ![alt text](https://github.com/fischtank44/flight_engineer/raw/master/images/final_pruned_partial_dependency_pipeline.png)
 
