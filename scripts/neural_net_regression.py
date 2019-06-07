@@ -423,7 +423,13 @@ checkpoint = ModelCheckpoint(checkpoint_name, monitor='val_loss', verbose = 1, s
 callbacks_list = [checkpoint]
 
 
-NN_model.fit(train, target, epochs=1, batch_size=32, validation_split = 0.2, callbacks=callbacks_list)
+NN_model.fit(train, target, epochs=15, batch_size=32, validation_split = 0.2, callbacks=callbacks_list)
+
+
+# Load wights file of the best model :
+wights_file = 'Weights-002--0.01048.hdf5' # choose the best checkpoint 
+NN_model.load_weights(wights_file) # load it
+NN_model.compile(loss='mean_absolute_error', optimizer='adam', metrics=['mean_absolute_error'])
 
 
 # ###########                Train to y_failure (0-1)                ######################
@@ -433,58 +439,56 @@ NN_model.fit(train, target, epochs=1, batch_size=32, validation_split = 0.2, cal
 # ytest = df_new_test['y_failure']
 # X_test_features = df_new_test[train_features]
 
+test = df1.iloc[test_list].copy()
+train = df1.iloc[train_list].copy()
+
+train_y = train['y_failure']
+train_X =  train.copy()
+test_y =  test['y_failure']
+test_X =  test.copy()
 
 
 
-### Hold for future use  #######
-# Xtrain, Xtest, ytrain, ytest = train_test_split(X_features, y, test_size = .2, random_state=137)
-# Xtrain.shape
-# Xtest.shape
-# ytrain.shape
-# ytest.shape
 
 
 
-# L_y_predicted
-# ############ 
-# ######   Check the coefficients from the model 
-# L_model.coef_
-# print(list(zip(L_model.coef_, X_features)))
+# train_X, val_X, train_y, val_y = train_test_split(train, target, test_size = 0.25, random_state = 14)
+
+model = RandomForestRegressor(n_estimators = 100)
+model.fit(train_X,train_y)
+
+# Get the mean absolute error on the validation data
+predicted_life = model.predict(test_X)
+MAE = mean_absolute_error(test_y , predicted_life)
+print('Random forest validation MAE = ', MAE)
+
+###################    XG Boost Model  #########################
+
+XGBModel = XGBRegressor()
+XGBModel.fit(train_X,train_y , verbose=False)
+
+# Get the mean absolute error on the validation data :
+XGBpredictions = XGBModel.predict(test_X)
+MAE = mean_absolute_error(test_y , XGBpredictions)
+print('XGBoost validation MAE = ',MAE)
 
 
-##### Model from old train/test split
-# [(0.2098130774662108, 'unit'), (-7.173759447981604, 't24_lpc'), 
-# (-0.42305195925658207, 't30_hpc'), (-0.7441639445488603, 't50_lpt'), 
-# (7.61219378587503, 'p30_hpc'), (-12.147203483784747, 'nf_fan_speed'), 
-# (-0.3844533247091928, 'nc_core_speed'), (-34.641657728829905, 'ps_30_sta_press'),
-#  (11.105368284298036, 'phi_fp_ps30'), (-4.474447225499914, 'nrf_cor_fan_sp'), 
-#  (-0.20542361139388693, 'nrc_core_sp'), (-126.19522472669553, 'bpr_bypass_rat'), 
-#  (-1.9171623154921535, 'htbleed_enthalpy'), (22.12461560626438, 'w31_hpt_cool_bl'),
-#  (42.47336192785645, 'w32_lpt_cool_bl')]
-#
-#  Model from new 80 engine 20 test train/test split
-# #print(list(zip(L_model.coef_, X_features)))
-# [(-7.9993983227825884, 't24_lpc'), (-0.40343998913641343, 't30_hpc'), 
-# (-0.858069141166363, 't50_lpt'), (7.118138412200282, 'p30_hpc'), 
-# (-26.53526438485433, 'nf_fan_speed'), (-0.28820253265246504, 'nc_core_speed'), 
-# (-38.13957596837547, 'ps_30_sta_press'), (9.984072018801038, 'phi_fp_ps30'), 
-# (-21.747334830714323, 'nrf_cor_fan_sp'), (-0.28742611769798204, 'nrc_core_sp'), 
-# (-101.5927346354093, 'bpr_bypass_rat'), (-1.6264557877934611, 'htbleed_enthalpy'),
-#  (19.17595070701376, 'w31_hpt_cool_bl'), (42.100133123738566, 'w32_lpt_cool_bl')]
-#
-#
-#
+
+
 #
 
 # #####   Plot the data from the first model and evaluate the residuals
 
-plt.scatter(L_y_predicted, ytrain, alpha = 0.1)
+plt.scatter(XGBpredictions, val_y, alpha = 0.1)
 plt.xlabel('y hat from training set')
 plt.ylabel( 'y values from training set')
 plt.show()
 ###
 
-
+plt.scatter(predicted_life, val_y, alpha = 0.1)
+plt.xlabel('y hat from training set')
+plt.ylabel( 'y values from training set')
+plt.show()
 
 
 
